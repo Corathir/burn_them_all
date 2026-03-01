@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://ck7rb5xlreedd"]
+
+[ext_resource type="Script" uid="uid://dyd2i6tfcdpev" path="res://scripts/ui/stat_bar.gd" id="1_roq0j"]
+
+[node name="StatBar" type="Control" unique_id=147790743]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("1_roq0j")
+metadata/_edit_use_anchors_ = true
+
+[node name="ProgressBar" type="ProgressBar" parent="." unique_id=495884599]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+show_percentage = false
+
+[node name="Label" type="Label" parent="." unique_id=1373366690]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1

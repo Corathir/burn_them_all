@@ -18,10 +18,8 @@ enemy_data = ExtResource("4_lquwl")
 
 [node name="EnemySlot2" parent="CombatArena" unique_id=260179099 instance=ExtResource("3_lquwl")]
 layout_mode = 0
-offset_left = 153.0
-offset_top = 4.0
-offset_right = 303.0
-offset_bottom = 204.0
+offset_left = 154.0
+offset_right = 304.0
 enemy_data = ExtResource("4_lquwl")
 
 [node name="Hud" parent="." unique_id=1017484349 instance=ExtResource("4_7mycd")]
