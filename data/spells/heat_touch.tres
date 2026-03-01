@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="SpellResource" format=3 uid="uid://cv6cxhqgnku1i"]
+
+[ext_resource type="Script" uid="uid://dfci4odqknqky" path="res://scripts/resources/spell_resource.gd" id="1_7l6dd"]
+
+[resource]
+script = ExtResource("1_7l6dd")
+spell_name = "Heat Touch"
+heat_cost = 10

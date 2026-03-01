@@ -1,0 +1,13 @@
+extends Node
+
+#class_name EventBus
+
+signal spell_selected(spell_res: Resource)
+signal spell_cast(spell_res: Resource)
+signal target_selected(enemy: Enemy)
+signal heat_changed(value: int)
+signal burn_stage_changed(target)
+signal turn_ended()
+signal combat_finished(result)
+signal log_entry(text)
+signal state_changed(new_state)

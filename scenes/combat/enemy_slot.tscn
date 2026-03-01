@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://btl1j5jcqo5u3"]
+
+[ext_resource type="Script" uid="uid://bx7qr3f6ty7c4" path="res://scripts/combat/enemy.gd" id="1_xo6kn"]
+[ext_resource type="Texture2D" uid="uid://0mbe50qgr3u" path="res://assets/skeleton_warrior.png" id="2_fij4o"]
+
+[node name="EnemySlot" type="Control" unique_id=1450897046]
+custom_minimum_size = Vector2(150, 200)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 150.0
+offset_bottom = 200.0
+size_flags_horizontal = 3
+script = ExtResource("1_xo6kn")
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=295235232]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 81.0
+grow_horizontal = 2
+
+[node name="NameLabel" type="Label" parent="Column" unique_id=952130091]
+layout_mode = 2
+
+[node name="HPBar" type="ProgressBar" parent="Column" unique_id=330825619]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+show_percentage = false
+
+[node name="Label" type="Label" parent="Column/HPBar" unique_id=1693805255]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BurnStageLabel" type="Label" parent="Column" unique_id=1155376624]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=441156943]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -147.0
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("2_fij4o")
+expand_mode = 3
+
+[node name="ClickArea" type="Button" parent="." unique_id=220008760]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

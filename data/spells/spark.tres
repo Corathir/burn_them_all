@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="SpellResource" format=3 uid="uid://ckgg0jkppb5k6"]
+
+[ext_resource type="Script" uid="uid://dfci4odqknqky" path="res://scripts/resources/spell_resource.gd" id="1_devp1"]
+
+[resource]
+script = ExtResource("1_devp1")
+spell_name = "Spark"
+heat_cost = 20

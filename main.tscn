@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://3pimjqwsjuxp"]
+
+[ext_resource type="PackedScene" uid="uid://bpjtlnxsltrsr" path="res://scenes/combat/combat_manager.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://gg3qnle0cdq4" path="res://scenes/combat/combat_arena.tscn" id="2_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://btl1j5jcqo5u3" path="res://scenes/combat/enemy_slot.tscn" id="3_lquwl"]
+[ext_resource type="PackedScene" uid="uid://bnecbk17wmvo4" path="res://scenes/ui/hud.tscn" id="4_7mycd"]
+[ext_resource type="Resource" uid="uid://bronnjjg6i4q4" path="res://data/enemies/skeleton.tres" id="4_lquwl"]
+
+[node name="Main" type="Node3D" unique_id=674803667]
+
+[node name="CombatManager" parent="." unique_id=728938415 instance=ExtResource("1_ig7tw")]
+
+[node name="CombatArena" parent="." unique_id=478988957 instance=ExtResource("2_1bvp3")]
+
+[node name="EnemySlot" parent="CombatArena" unique_id=537223471 instance=ExtResource("3_lquwl")]
+layout_mode = 0
+enemy_data = ExtResource("4_lquwl")
+
+[node name="EnemySlot2" parent="CombatArena" unique_id=260179099 instance=ExtResource("3_lquwl")]
+layout_mode = 0
+offset_left = 153.0
+offset_top = 4.0
+offset_right = 303.0
+offset_bottom = 204.0
+enemy_data = ExtResource("4_lquwl")
+
+[node name="Hud" parent="." unique_id=1017484349 instance=ExtResource("4_7mycd")]
+offset_top = 508.0
