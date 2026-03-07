@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://b0yy5fjtgc1ct"]
+
+[node name="SpellPanel" type="PanelContainer" unique_id=1219809770]
+size_flags_horizontal = 3
+
+[node name="GridContainer" type="GridContainer" parent="." unique_id=2113679532]
+layout_mode = 2
+
+[node name="EndTurn" type="Button" parent="." unique_id=611510612]
+layout_mode = 2

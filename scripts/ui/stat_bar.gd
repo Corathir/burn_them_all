@@ -9,7 +9,7 @@ var current_value: int
 @onready var bar: ProgressBar = $ProgressBar
 @onready var label: Label = $Label
 
-func init(max_value):
+func init(max_value: int):
     self.min_value = 0
     self.max_value = max_value
     self.current_value = max_value
@@ -20,7 +20,7 @@ func init(max_value):
 
     label.text = str(max_value)
 
-func update_value(current_val):
+func update_value(current_val: int):
     self.current_value = current_val
     bar.value = current_val
     label.text = str(current_val)
