@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://idk4i50qhgod" path="res://scripts/ui/hud.gd" id="1_0mwgc"]
 [ext_resource type="PackedScene" uid="uid://ck7rb5xlreedd" path="res://scenes/ui/stat_bar.tscn" id="2_hqnrr"]
+[ext_resource type="PackedScene" uid="uid://b0yy5fjtgc1ct" path="res://scenes/ui/spell_panel.tscn" id="3_bo48s"]
 
 [node name="Hud" type="Control" unique_id=1017484349]
 custom_minimum_size = Vector2(200, 20)
@@ -21,12 +22,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="SpellPanel" parent="VBoxContainer" unique_id=1219809770 instance=ExtResource("3_bo48s")]
+layout_mode = 2
+
 [node name="OverflowWarning" type="Label" parent="VBoxContainer" unique_id=413083051]
 visible = false
 layout_mode = 2
 
-[node name="HpBar" parent="VBoxContainer" unique_id=147790743 instance=ExtResource("2_hqnrr")]
+[node name="HeatBar" parent="VBoxContainer" unique_id=74169736 instance=ExtResource("2_hqnrr")]
 layout_mode = 2
 
-[node name="HeatBar" parent="VBoxContainer" unique_id=74169736 instance=ExtResource("2_hqnrr")]
+[node name="HpBar" parent="VBoxContainer" unique_id=147790743 instance=ExtResource("2_hqnrr")]
 layout_mode = 2

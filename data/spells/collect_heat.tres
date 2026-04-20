@@ -1,9 +1,13 @@
 [gd_resource type="Resource" script_class="SpellResource" format=3 uid="uid://xeotkwgeowlu"]
 
+[ext_resource type="Texture2D" uid="uid://32j7415lu0b8" path="res://assets/spells/collect_heat.svg" id="1_5hspq"]
 [ext_resource type="Script" uid="uid://dfci4odqknqky" path="res://scripts/resources/spell_resource.gd" id="1_echtb"]
+[ext_resource type="Texture2D" uid="uid://dn7vwvchxieft" path="res://assets/spells/collect_heat_active.svg" id="2_a7a87"]
 
 [resource]
 script = ExtResource("1_echtb")
 spell_name = "Collect Heat"
 ends_turn = true
 target_type = 1
+icon = ExtResource("1_5hspq")
+icon_active = ExtResource("2_a7a87")

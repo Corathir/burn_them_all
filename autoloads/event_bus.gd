@@ -11,3 +11,9 @@ signal turn_ended()
 signal combat_finished(result)
 signal log_entry(text)
 signal state_changed(new_state)
+
+func _ready() -> void:
+    EventBus.log_entry.connect(_log_entry)
+
+func _log_entry(text):
+    print(text)

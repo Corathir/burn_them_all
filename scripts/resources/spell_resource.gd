@@ -7,6 +7,8 @@ class_name SpellResource
 @export var ends_turn: bool
 @export var description: String
 @export var target_type: TargetType
+@export var icon: Texture2D
+@export var icon_active: Texture2D
 
 enum TargetType {
     SINGLE_ENEMY,

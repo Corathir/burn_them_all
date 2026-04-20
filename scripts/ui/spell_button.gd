@@ -12,6 +12,8 @@ signal pressed_spell(spell_res)
 @onready var click_area: Button = $ClickArea
 @onready var name_label = $Column/NameLabel
 @onready var cost_label: Label = $Column/CostLabel
+@onready var icon: TextureRect = $Icon
+@onready var icon_active: TextureRect = $IconActive
 
 func init(spell: SpellResource):
     name_label.text = spell.spell_name
@@ -19,6 +21,8 @@ func init(spell: SpellResource):
     spell_name = spell.spell_name
     heat_cost = spell.heat_cost
     spell_resource = spell
+    icon.texture = spell.icon
+    icon_active.texture = spell.icon_active
     click_area.pressed.connect(_on_click)
 
 func update_disabled_state(current_heat: int):

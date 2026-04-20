@@ -8,11 +8,17 @@ var burn_stage: int
 @onready var hp_bar: StatBar = $VBoxContainer/HpBar
 @onready var heat_bar: StatBar = $VBoxContainer/HeatBar
 @onready var overflow_warning: Label = $VBoxContainer/OverflowWarning
+@onready var spell_panel: SpellPanel = $VBoxContainer/SpellPanel
 
 
 func _ready():
     hp_bar.init(100)
     heat_bar.init(200)
+    spell_panel.load_spells([
+        preload("res://data/spells/collect_heat.tres"),
+        preload("res://data/spells/heat_touch.tres"),
+        preload("res://data/spells/spark.tres")
+    ])
     
     EventBus.heat_changed.connect(_heat_changed)
 
