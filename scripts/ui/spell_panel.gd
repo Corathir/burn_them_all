@@ -2,8 +2,8 @@ extends Control
 
 class_name SpellPanel
 
-@onready var button_container: GridContainer = $GridContainer
-@onready var end_turn_button: Button = $EndTurn
+@onready var button_container: GridContainer = $VBoxContainer/GridContainer
+@onready var end_turn_button: Button = $VBoxContainer/EndTurn
 
 var buttons: Array[SpellButton] = []
 
@@ -14,8 +14,8 @@ func _ready() -> void:
 func load_spells(spells: Array[SpellResource]):
     for spell in spells:
         var spell_button = preload("res://scenes/ui/spell_button.tscn").instantiate()
-        spell_button.init(spell)
         button_container.add_child(spell_button)
+        spell_button.init(spell)
         buttons.append(spell_button)
         spell_button.pressed_spell.connect(_on_spell_click)
         

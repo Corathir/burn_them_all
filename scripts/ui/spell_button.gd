@@ -11,10 +11,10 @@ signal pressed_spell(spell_res)
 @onready var overlay = $Overlay
 @onready var click_area: Button = $ClickArea
 @onready var name_label = $Column/NameLabel
-@onready var cost_label: Button = $Column/CostLabel
+@onready var cost_label: Label = $Column/CostLabel
 
 func init(spell: SpellResource):
-    name_label.text = spell_name
+    name_label.text = spell.spell_name
     cost_label.text = str(spell.heat_cost)
     spell_name = spell.spell_name
     heat_cost = spell.heat_cost
