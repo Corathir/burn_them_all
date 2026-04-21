@@ -36,6 +36,8 @@ func _click_enemy(enemy: Enemy):
         _end_player_turn()
     else:
         _spend_heat(selected_spell.heat_cost)
+        if selected_spell.spell_name == "Spark":
+            burning_system.ignite(enemy)
         EventBus.log_entry.emit(selected_spell.spell_name + ' → ' + enemy.enemy_data.enemy_name + ' (' + str(-1 * selected_spell.heat_cost) + ' Heat)')
         selected_spell = null
         EventBus.spell_resolved.emit()
