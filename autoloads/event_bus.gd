@@ -12,6 +12,7 @@ signal combat_finished(result)
 signal log_entry(text)
 signal state_changed(new_state)
 signal spell_resolved()
+signal combat_initialized(max_hp: int, hp: int, max_heat: int, heat: int)
 
 func _ready() -> void:
     EventBus.log_entry.connect(_log_entry)

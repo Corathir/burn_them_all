@@ -20,8 +20,8 @@ func init(data: EnemyResource):
     
     
     name_label.text = data.enemy_name
-    hp_bar.init(data.max_hp)
     current_hp = data.max_hp
+    hp_bar.init(data.max_hp, current_hp)
     
     click_area.flat = true
     click_area.pressed.connect(_on_click)

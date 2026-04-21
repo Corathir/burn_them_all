@@ -6,14 +6,19 @@ class_name CombatManager
 
 var selected_spell: SpellResource
 
-var current_heat: int = 50
+var max_hp: int = 100
 var player_hp: int = 100
+var max_heat: int = 200
+var current_heat: int = 50
 
 func _ready():
-    EventBus.heat_changed.emit(current_heat)
     EventBus.target_selected.connect(_click_enemy)
     EventBus.spell_cast.connect(_spell_cast)
     EventBus.turn_ended.connect(_end_player_turn)
+    _emit_initial_state.call_deferred()
+
+func _emit_initial_state():
+    EventBus.combat_initialized.emit(max_hp, player_hp, max_heat, current_heat)
 
 func _spend_heat(amount: int):
     current_heat -= amount
