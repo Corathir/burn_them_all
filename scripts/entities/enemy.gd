@@ -12,6 +12,7 @@ var burn_stage: int
 @export var enemy_data: EnemyResource
 
 func _ready():
+    add_to_group("enemies")
     if (enemy_data != null):
         init(enemy_data)
 

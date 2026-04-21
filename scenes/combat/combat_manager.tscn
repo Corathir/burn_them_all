@@ -1,6 +1,9 @@
-[gd_scene format=3 uid="uid://bpjtlnxsltrsr"]
+[gd_scene load_steps=3 format=3 uid="uid://bpjtlnxsltrsr"]
 
 [ext_resource type="Script" uid="uid://7ktvn6i4xr07" path="res://scripts/combat/combat_manager.gd" id="1_hwpx2"]
+[ext_resource type="PackedScene" uid="uid://cq8y5xfvb3mhp" path="res://scenes/combat/burning_system.tscn" id="2_burning_system"]
 
 [node name="CombatManager" type="Node" unique_id=728938415]
 script = ExtResource("1_hwpx2")
+
+[node name="BurningSystem" parent="." instance=ExtResource("2_burning_system")]

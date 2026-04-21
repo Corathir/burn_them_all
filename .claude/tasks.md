@@ -1,23 +1,27 @@
 ﻿# Current task
 
-Implement CombatLog scene and wire it up, then implement full turn cycle with BurningSystem.
+Task 18 — Spark spell actual effect: call `BurningSystem.ignite(enemy)`.
 
 ---
 
 ## State
 
-### Done (tasks 1–13 + partial 14)
+### Done (tasks 1–17)
 - Project structure, EventBus with signals
 - SpellResource, EnemyResource, .tres test files
 - Scenes: EnemySlot, CombatArena, HUD
 - Components: StatBar, SpellButton, SpellPanel
-- CombatManager skeleton: stores selected_spell, spends Heat on target click, emits log_entry
+- CombatManager: selected_spell, heat spend/gain, turn cycle, enemy phase, overflow damage
+- CombatLog scene: listens to `log_entry`, auto-scrolls
+- BurningSystem: `ignite`, `advance_all`, `get_stage`, `collect_heat`, stage-change logs
+- Full turn cycle: player phase → overflow check → advance burn → enemy phase
 
 ### Current code notes
 - `EventBus` has `spell_resolved` signal (not in original spec — added during development, keep it)
 - `SpellPanel` listens to `spell_resolved` to deselect active button — this is correct
-- `Enemy.burn_stage: int` exists but is unused — BurningSystem will own this
+- `Enemy.burn_stage: int` exists but is unused — BurningSystem owns burn state via `burning_targets` dict
 - `CombatManager.current_heat` starts at 50 (hardcoded for testing)
+- `BurningSystem.ignite()` is never called yet — `burning_targets` is always empty until Task 18
 
 ---
 

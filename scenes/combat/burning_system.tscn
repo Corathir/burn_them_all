@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c40ndiicaqrfg"]
+
+[ext_resource type="Script" uid="uid://dl0tenttb684c" path="res://scripts/combat/burning_system.gd" id="1_burning_system"]
+
+[node name="BurningSystem" type="Node" unique_id=482409684]
+script = ExtResource("1_burning_system")
