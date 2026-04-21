@@ -19,6 +19,10 @@ config/icon="res://icon.svg"
 
 EventBus="*uid://dpoe4c5xhhd8p"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/rider-plugin/plugin.cfg")
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
