@@ -11,6 +11,7 @@ signal turn_ended()
 signal combat_finished(result)
 signal log_entry(text)
 signal state_changed(new_state)
+signal spell_resolved()
 
 func _ready() -> void:
     EventBus.log_entry.connect(_log_entry)

@@ -25,8 +25,14 @@ func init(spell: SpellResource):
     icon_active.texture = spell.icon_active
     click_area.pressed.connect(_on_click)
 
+func set_active(active: bool):
+    icon.visible = !active
+    icon_active.visible = active
+
 func update_disabled_state(current_heat: int):
-    overlay.visible = current_heat < heat_cost
+    var not_enough_heat = current_heat < heat_cost
+    overlay.visible = not_enough_heat
+    click_area.disabled = not_enough_heat
 
 func _on_click():
     pressed_spell.emit(spell_resource)

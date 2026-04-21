@@ -2,7 +2,7 @@ extends Node
 
 class_name CombatManager
 
-var selected_spell: SpellButton
+var selected_spell: SpellResource
 
 var current_heat: int = 50
 
@@ -24,7 +24,9 @@ func _click_enemy(enemy: Enemy):
         return
 
     _spend_heat(selected_spell.heat_cost)
-    EventBus.log_entry.emit(selected_spell.name + ' → ' + enemy.enemy_data.enemy_name + ' (' + str(-1 * selected_spell.heat_cost) + ' Heat)')
+    EventBus.log_entry.emit(selected_spell.spell_name + ' → ' + enemy.enemy_data.enemy_name + ' (' + str(-1 * selected_spell.heat_cost) + ' Heat)')
+    selected_spell = null
+    EventBus.spell_resolved.emit()
 
-func _spell_cast(spell: SpellButton):
+func _spell_cast(spell: SpellResource):
     selected_spell = spell
