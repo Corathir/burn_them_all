@@ -3,7 +3,7 @@ extends Node
 #class_name EventBus
 
 signal spell_selected(spell_res: Resource)
-signal spell_cast(spell_res: Resource)
+signal spell_cast(spell_res: SpellResource)
 signal target_selected(enemy: Enemy)
 signal heat_changed(value: int)
 signal burn_stage_changed(target)

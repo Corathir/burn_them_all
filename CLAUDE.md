@@ -46,9 +46,13 @@ EventBus.target_selected →  CombatManager._on_target_selected
 Not a component on Enemy. One node manages all burning targets.
 `BurningSystem` advances stages at the start of each round, not per-entity.
 
-**HUD does not own game state**
-`hud.gd` only reacts to EventBus signals. It does not load spells, does not hold HP/Heat values.
-Spells are loaded by `CombatManager`, sent to `SpellPanel` via `EventBus.spells_loaded`.
+**UI does not own game state**
+UI scripts (`scripts/ui/`) only react to EventBus signals — they don't hold HP, Heat, or burn stage values.
+`hud.gd` does not load spells either. Spells are loaded by `CombatManager` and sent to `SpellPanel` via `EventBus.spells_loaded`.
+
+**Enemy is a visual entity, not a logical one**
+`scripts/entities/enemy.gd` holds display state only (`current_hp`, `burn_stage` for UI).
+Damage calculation and burn stage transitions live in `CombatManager` / `BurningSystem`, not in `Enemy`.
 
 ---
 
