@@ -1,8 +1,9 @@
-[gd_scene format=3 uid="uid://btl1j5jcqo5u3"]
+[gd_scene load_steps=5 format=3 uid="uid://btl1j5jcqo5u3"]
 
 [ext_resource type="Script" uid="uid://bx7qr3f6ty7c4" path="res://scripts/entities/enemy.gd" id="1_xo6kn"]
 [ext_resource type="Texture2D" uid="uid://0mbe50qgr3u" path="res://assets/skeleton_warrior.png" id="2_fij4o"]
 [ext_resource type="PackedScene" uid="uid://ck7rb5xlreedd" path="res://scenes/ui/stat_bar.tscn" id="2_yq2om"]
+[ext_resource type="PackedScene" uid="uid://br3kxn7p2m4qa" path="res://scenes/ui/burn_status_icon.tscn" id="3_burnicon"]
 
 [node name="EnemySlot" type="Control" unique_id=1450897046]
 custom_minimum_size = Vector2(150, 200)
@@ -26,7 +27,10 @@ layout_mode = 2
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="BurnStageLabel" type="Label" parent="Column" unique_id=1155376624]
+[node name="StatusEffects" type="HBoxContainer" parent="Column" unique_id=1155376624]
+layout_mode = 2
+
+[node name="BurnIcon" parent="Column/StatusEffects" unique_id=1155376625 instance=ExtResource("3_burnicon")]
 layout_mode = 2
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=441156943]

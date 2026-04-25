@@ -34,6 +34,9 @@ func _click_enemy(enemy: Enemy):
 
     if selected_spell.ends_turn:
         var heat_gained = burning_system.collect_heat(enemy)
+        if heat_gained <= 0:
+            EventBus.log_entry.emit("Cannot collect from " + enemy.enemy_data.enemy_name)
+            return
         _gain_heat(heat_gained)
         EventBus.log_entry.emit(selected_spell.spell_name + ' → ' + enemy.enemy_data.enemy_name + ' (+' + str(heat_gained) + ' Heat)')
         selected_spell = null
@@ -41,8 +44,8 @@ func _click_enemy(enemy: Enemy):
         _end_player_turn()
     else:
         _spend_heat(selected_spell.heat_cost)
-        if selected_spell.spell_name == "Spark":
-            burning_system.ignite(enemy)
+        if selected_spell.heat_reward > 0:
+            burning_system.ignite(enemy, selected_spell.heat_reward)
         EventBus.log_entry.emit(selected_spell.spell_name + ' → ' + enemy.enemy_data.enemy_name + ' (' + str(-1 * selected_spell.heat_cost) + ' Heat)')
         selected_spell = null
         EventBus.spell_resolved.emit()

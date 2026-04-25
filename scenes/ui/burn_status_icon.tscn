@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://br3kxn7p2m4qa"]
+
+[ext_resource type="Script" path="res://scripts/ui/burn_status_icon.gd" id="1_burn_icon"]
+
+[node name="BurnStatusIcon" type="Control"]
+custom_minimum_size = Vector2(40, 40)
+script = ExtResource("1_burn_icon")
+
+[node name="Icon" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RewardLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -22.0
+offset_top = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+horizontal_alignment = 2

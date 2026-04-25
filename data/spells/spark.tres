@@ -8,5 +8,6 @@
 script = ExtResource("1_devp1")
 spell_name = "Spark"
 heat_cost = 20
+heat_reward = 20
 icon = ExtResource("1_id6pj")
 icon_active = ExtResource("2_i8hjm")

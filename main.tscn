@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://btl1j5jcqo5u3" path="res://scenes/combat/enemy_slot.tscn" id="3_lquwl"]
 [ext_resource type="PackedScene" uid="uid://bnecbk17wmvo4" path="res://scenes/ui/hud.tscn" id="4_7mycd"]
 [ext_resource type="Resource" uid="uid://bronnjjg6i4q4" path="res://data/enemies/skeleton.tres" id="4_lquwl"]
-[ext_resource type="PackedScene" path="res://scenes/ui/combat_log.tscn" id="5_combat_log"]
+[ext_resource type="PackedScene" uid="uid://dm0yxf8lvb5kv" path="res://scenes/ui/combat_log.tscn" id="5_combat_log"]
 
 [node name="Main" type="Node3D" unique_id=674803667]
 

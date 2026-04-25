@@ -3,11 +3,11 @@ extends Control
 class_name Enemy
 
 var current_hp: int
-var burn_stage: int
 
 @onready var name_label: Label = $Column/NameLabel
 @onready var hp_bar: StatBar = $Column/HpBar
 @onready var click_area: Button = $ClickArea
+@onready var burn_icon: BurnStatusIcon = $Column/StatusEffects/BurnIcon
 
 @export var enemy_data: EnemyResource
 
@@ -15,14 +15,13 @@ func _ready():
     add_to_group("enemies")
     if (enemy_data != null):
         init(enemy_data)
+    EventBus.burn_stage_changed.connect(_on_burn_stage_changed)
 
 func init(data: EnemyResource):
-    
-    
     name_label.text = data.enemy_name
     current_hp = data.max_hp
     hp_bar.init(data.max_hp, current_hp)
-    
+
     click_area.flat = true
     click_area.pressed.connect(_on_click)
 
@@ -32,3 +31,8 @@ func _on_click():
 func get_damage(damage: int):
     current_hp -= damage
     hp_bar.update_value(current_hp)
+
+func _on_burn_stage_changed(target, stage: int, reward: int):
+    if target != self:
+        return
+    burn_icon.set_stage(stage, reward)
