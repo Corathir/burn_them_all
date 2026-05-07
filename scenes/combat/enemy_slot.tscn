@@ -3,9 +3,10 @@
 [ext_resource type="Script" uid="uid://bx7qr3f6ty7c4" path="res://scripts/entities/enemy.gd" id="1_xo6kn"]
 [ext_resource type="Texture2D" uid="uid://0mbe50qgr3u" path="res://assets/skeleton_warrior.png" id="2_fij4o"]
 [ext_resource type="PackedScene" uid="uid://ck7rb5xlreedd" path="res://scenes/ui/stat_bar.tscn" id="2_yq2om"]
-[ext_resource type="PackedScene" uid="uid://br3kxn7p2m4qa" path="res://scenes/ui/burn_status_icon.tscn" id="3_burnicon"]
+[ext_resource type="Script" path="res://scripts/combat/status_container.gd" id="4_status_container"]
+[ext_resource type="Script" path="res://scripts/combat/spellbook.gd" id="5_spellbook"]
 
-[node name="EnemySlot" type="Control" unique_id=1450897046]
+[node name="EnemySlot" type="Control"]
 custom_minimum_size = Vector2(150, 200)
 layout_mode = 3
 anchors_preset = 0
@@ -13,27 +14,30 @@ offset_right = 150.0
 offset_bottom = 200.0
 script = ExtResource("1_xo6kn")
 
-[node name="Column" type="VBoxContainer" parent="." unique_id=295235232]
+[node name="Column" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 81.0
 grow_horizontal = 2
 
-[node name="NameLabel" type="Label" parent="Column" unique_id=952130091]
+[node name="NameLabel" type="Label" parent="Column"]
 layout_mode = 2
 
-[node name="HpBar" parent="Column" unique_id=147790743 instance=ExtResource("2_yq2om")]
+[node name="HpBar" parent="Column" instance=ExtResource("2_yq2om")]
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="StatusEffects" type="HBoxContainer" parent="Column" unique_id=1155376624]
+[node name="StatusContainer" type="HBoxContainer" parent="Column"]
+unique_name_in_owner = true
 layout_mode = 2
+script = ExtResource("4_status_container")
 
-[node name="BurnIcon" parent="Column/StatusEffects" unique_id=1155376625 instance=ExtResource("3_burnicon")]
-layout_mode = 2
+[node name="Spellbook" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("5_spellbook")
 
-[node name="TextureRect" type="TextureRect" parent="." unique_id=441156943]
+[node name="TextureRect" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -45,7 +49,7 @@ grow_vertical = 0
 texture = ExtResource("2_fij4o")
 expand_mode = 3
 
-[node name="ClickArea" type="Button" parent="." unique_id=220008760]
+[node name="ClickArea" type="Button" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
