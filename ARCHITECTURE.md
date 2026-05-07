@@ -247,7 +247,7 @@ Inventory сам отслеживает наложенные через него
 
 **Контракт:**
 
-```gdscript
+```
 info_panel.show_for(anchor: Control, data: Dictionary)
 info_panel.hide_panel()
 ```
@@ -279,6 +279,35 @@ info_panel.hide_panel()
 Если `arena.def == null` или арена пустая — popup всё равно показывается с заглушкой «Plain arena. No special effects.»
 
 Подключается напрямую в `main.tscn` (не в `Hud`, потому что HUD прижат к низу экрана).
+
+### 4.12. CombatLog + LogButton (toggleable окно)
+
+`CombatLog` (`scripts/ui/combat_log.gd`, `scenes/ui/combat_log.tscn`) — окно лога боя.
+
+Структура сцены:
+```
+CombatLog (Control, visible = false по умолчанию)
+  Panel (Panel)              — фон, fill rect
+  ScrollContainer            — offset_top=48, чтобы освободить место под × кнопку
+    LogText (RichTextLabel, %)
+  CloseButton (Button "×", %) — anchor top-right, 48×48
+```
+
+API:
+- `open()` — `visible = true`
+- `close()` — `visible = false`, эмитит сигнал `closed`
+- Сам подписан на `EventBus.log_entry` и копит записи в `LogText` независимо от видимости.
+
+`LogButton` (`scripts/ui/log_button.gd`, `scenes/ui/log_button.tscn`) — кнопка 48×48 в правом верхнем углу экрана (зеркало `ArenaIcon`). `@export var combat_log_path: NodePath`.
+
+**Поведение:**
+- Старт: `LogButton` виден, лог скрыт.
+- Клик по `LogButton` → `combat_log.open()` + `LogButton.visible = false`.
+- Клик по `×` внутри лога → `combat_log.close()` → сигнал `closed` → `LogButton.visible = true`.
+
+**Геометрия (важно):** правая кромка лога = `vp_w - 8`, верх = `8`. `CloseButton` 48×48 в правом верхнем углу лога с нулевыми отступами от его кромок. `LogButton` 48×48 в правом верхнем углу экрана с теми же 8-px отступами. По построению они занимают **один и тот же экранный rect** — кнопка «не двигается» при открытии/закрытии, просто меняется её визуал и владелец.
+
+Подключается в `main.tscn` (как `ArenaIcon`). `LogButton.combat_log_path = "../CombatLog"`.
 
 ---
 
@@ -366,9 +395,10 @@ scripts/
     spell_panel.gd               — панель заклинаний и кнопка End Turn
     spell_button.gd              — отдельная кнопка заклинания
     stat_bar.gd                  — переиспользуемый ProgressBar+label
-    combat_log.gd                — лог боя
+    combat_log.gd                — окно лога боя (open/close + сигнал closed)
     info_panel.gd                — универсальный hover-popup (арена/статус/спелл)
     arena_icon.gd                — иконка арены в левом верхнем углу + свой InfoPanel
+    log_button.gd                — кнопка-открывалка лога в правом верхнем углу
 
 data/
   spells/    spark.tres, collect_heat.tres, heat_touch.tres, shield.tres
@@ -387,12 +417,14 @@ scenes/
     burning.tscn                 — Icon + RewardLabel
     shield.tscn                  — Icon + ChargesLabel
   ui/
-    hud.tscn, spell_panel.tscn, spell_button.tscn, stat_bar.tscn, combat_log.tscn
+    hud.tscn, spell_panel.tscn, spell_button.tscn, stat_bar.tscn
+    combat_log.tscn              — Control + Panel + ScrollContainer + CloseButton
     info_panel.tscn              — popup-панель (root: Control, mouse_filter=IGNORE)
     arena_icon.tscn              — Button-иконка с встроенным InfoPanel
+    log_button.tscn              — Button-иконка справа сверху, открывает CombatLog
 ```
 
-`main.tscn` инстансит `arena_icon.tscn` рядом с `Hud` и `CombatLog`.
+`main.tscn` инстансит `arena_icon.tscn` (top-left) и `log_button.tscn` (top-right) рядом с `Hud` и `CombatLog`. `CombatLog` теперь анкорится в правый верхний угол экрана (offset 8 px), чтобы `×` внутри лога совпал с `LogButton` экранными координатами.
 
 Запланировано (ещё нет):
 
@@ -458,7 +490,7 @@ scripts/entities/env_object.gd
 ### ...новый эффект заклинания
 
 1. `scripts/resources/effects/<имя>_effect.gd`:
-   ```gdscript
+   ```
    extends SpellEffectResource
    class_name MyNewEffect
 
@@ -475,7 +507,7 @@ scripts/entities/env_object.gd
 ### ...новый статус
 
 1. `scripts/statuses/<имя>.gd`:
-   ```gdscript
+   ```
    extends StatusEffect
    class_name MyStatus
 
