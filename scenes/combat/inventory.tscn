@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://b1nv3nt0ryp1r"]
+
+[ext_resource type="Script" path="res://scripts/combat/inventory.gd" id="1_inventory"]
+
+[node name="Inventory" type="Node"]
+script = ExtResource("1_inventory")
+
+[node name="BoundSlots" type="Node" parent="."]
+
+[node name="AccessorySlots" type="Node" parent="."]

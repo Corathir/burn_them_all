@@ -1,0 +1,29 @@
+[gd_scene load_steps=9 format=3 uid="uid://cp1ay3rsc3n0"]
+
+[ext_resource type="Script" path="res://scripts/entities/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://scripts/combat/status_container.gd" id="2_status_container"]
+[ext_resource type="Script" path="res://scripts/combat/spellbook.gd" id="3_spellbook"]
+[ext_resource type="PackedScene" uid="uid://b1nv3nt0ryp1r" path="res://scenes/combat/inventory.tscn" id="4_inventory"]
+[ext_resource type="Resource" uid="uid://ckgg0jkppb5k6" path="res://data/spells/spark.tres" id="5_spark"]
+[ext_resource type="Resource" uid="uid://cv6cxhqgnku1i" path="res://data/spells/heat_touch.tres" id="6_heat_touch"]
+[ext_resource type="Resource" uid="uid://xeotkwgeowlu" path="res://data/spells/collect_heat.tres" id="7_collect_heat"]
+[ext_resource type="Resource" uid="uid://dn7r5xkmqp2wb" path="res://data/spells/shield.tres" id="8_shield"]
+
+[node name="Player" type="Control"]
+script = ExtResource("1_player")
+max_hp = 100
+display_name = "Player"
+max_heat = 200
+initial_heat = 50
+basic_spells = Array[Resource]([ExtResource("5_spark"), ExtResource("6_heat_touch"), ExtResource("7_collect_heat"), ExtResource("8_shield")])
+
+[node name="StatusContainer" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_status_container")
+
+[node name="Spellbook" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("3_spellbook")
+
+[node name="Inventory" parent="." instance=ExtResource("4_inventory")]
+unique_name_in_owner = true
