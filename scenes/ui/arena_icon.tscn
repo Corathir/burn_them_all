@@ -1,7 +1,6 @@
-[gd_scene format=3 uid="uid://b4r3n41c0n1d"]
+[gd_scene load_steps=2 format=3 uid="uid://b4r3n41c0n1d"]
 
 [ext_resource type="Script" path="res://scripts/ui/arena_icon.gd" id="1_script"]
-[ext_resource type="PackedScene" uid="uid://b1nf0p4n3lu1d" path="res://scenes/ui/info_panel.tscn" id="2_info_panel"]
 
 [node name="ArenaIcon" type="Button"]
 custom_minimum_size = Vector2(48, 48)
@@ -11,6 +10,3 @@ offset_right = 56.0
 offset_bottom = 56.0
 text = "A"
 script = ExtResource("1_script")
-info_panel_path = NodePath("InfoPanel")
-
-[node name="InfoPanel" parent="." instance=ExtResource("2_info_panel")]

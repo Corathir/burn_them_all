@@ -16,6 +16,12 @@ const ANCHOR_GAP: float = 8.0
 func _ready() -> void:
     mouse_filter = Control.MOUSE_FILTER_IGNORE
     visible = false
+    if CombatContext.info_panel == null:
+        CombatContext.info_panel = self
+
+func _exit_tree() -> void:
+    if CombatContext.info_panel == self:
+        CombatContext.info_panel = null
 
 func show_for(anchor: Control, data: Dictionary) -> void:
     _populate(data)

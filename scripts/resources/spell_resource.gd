@@ -21,3 +21,19 @@ enum TargetType {
     SELF,
     NONE
 }
+
+func to_info_data() -> Dictionary:
+    var lines: Array = []
+    if heat_cost != 0:
+        lines.append({"label": "Heat cost", "value": str(heat_cost)})
+    if heat_reward != 0:
+        lines.append({"label": "Heat reward", "value": str(heat_reward)})
+    if ends_turn:
+        lines.append({"label": "Ends turn", "value": "yes"})
+    return {
+        "title": spell_name,
+        "icon": icon,
+        "subtitle": "Spell",
+        "description": description,
+        "lines": lines,
+    }

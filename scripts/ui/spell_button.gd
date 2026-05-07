@@ -24,6 +24,8 @@ func init(spell: SpellResource):
     icon.texture = spell.icon
     icon_active.texture = spell.icon_active
     click_area.pressed.connect(_on_click)
+    click_area.mouse_entered.connect(_on_mouse_entered)
+    click_area.mouse_exited.connect(_on_mouse_exited)
 
 func set_active(active: bool):
     icon.visible = !active
@@ -36,3 +38,13 @@ func update_disabled_state(current_heat: int):
 
 func _on_click():
     pressed_spell.emit(spell_resource)
+
+func _on_mouse_entered() -> void:
+    var panel: InfoPanel = CombatContext.info_panel
+    if panel and spell_resource:
+        panel.show_for(self, spell_resource.to_info_data())
+
+func _on_mouse_exited() -> void:
+    var panel: InfoPanel = CombatContext.info_panel
+    if panel:
+        panel.hide_panel()

@@ -243,7 +243,7 @@ Inventory сам отслеживает наложенные через него
 
 ### 4.10. InfoPanel — универсальный hover-popup
 
-`InfoPanel` (`scripts/ui/info_panel.gd`, `scenes/ui/info_panel.tscn`) — переиспользуемое всплывающее окно с информацией. Используется для арены, в будущем — для статусов и заклинаний.
+`InfoPanel` (`scripts/ui/info_panel.gd`, `scenes/ui/info_panel.tscn`) — переиспользуемое всплывающее окно с информацией. Используется для арены, статусов и заклинаний.
 
 **Контракт:**
 
@@ -268,17 +268,48 @@ info_panel.hide_panel()
 4. Финальный `clamp` обеих координат в пределах viewport с отступом 8 px.
 5. На время репозиционирования popup невидим (один кадр), чтобы не было «прыжка».
 
+**Стиль:** PanelContainer переопределяет `theme_override_styles/panel` непрозрачным `StyleBoxFlat` (bg `#1f1f23`, рамка `#73737f`, скругление 4 px). Это намеренно — popup должен полностью перекрывать UI под собой.
+
+**Регистрация (важно):** в проекте только **один** `InfoPanel`, инстансится в `main.tscn`. На `_ready()` он публикует себя в `CombatContext.info_panel`; на `_exit_tree()` снимает регистрацию. Все консьюмеры (`ArenaIcon`, `SpellButton`, `StatusEffect`) обращаются к нему через `CombatContext.info_panel` — никаких `@export NodePath`.
+
 > Используй `InfoPanel` вместо стандартных Godot-tooltip'ов везде, где нужна структурированная информация.
+
+### 4.10a. `to_info_data()` — паттерн «toString»
+
+`SpellResource` и `StatusEffect` определяют виртуальный метод
+
+```
+func to_info_data() -> Dictionary
+```
+
+по образцу `toString` из ООП — это контракт, который любой подкласс может расширить через `super.to_info_data()`.
+
+**Базовые реализации:**
+
+- `SpellResource.to_info_data()` — `{title: spell_name, icon, subtitle: "Spell", description, lines: [Heat cost / Heat reward / Ends turn]}`. У спеллов нет наследников (поведение собирается из `effects`), поэтому метод финальный по факту.
+- `StatusEffect.to_info_data()` — `{title: display_name, subtitle: "Status", lines: [Stacks]}`. Подклассы переопределяют.
+
+**Текущие override'ы:**
+
+- `BurningStatus.to_info_data()` — зовёт `super`, ставит `icon` по текущей `stage`, добавляет описание и `lines: [Stage / Stored fuel / Collect coefficient]`.
+- `ShieldStatus.to_info_data()` — зовёт `super`, подставляет текстуру `icon` ноды и описание (стак-строка из базы остаётся).
+
+**Кто рисует:**
+
+- `SpellButton.init()` подключает `click_area.mouse_entered/exited` и зовёт `info_panel.show_for(self, spell.to_info_data())`.
+- `StatusEffect._ready()` (база) — выставляет всем дочерним `Control` `mouse_filter = IGNORE` (чтобы лейбл/иконка не перехватывали hover у корня), подключает свой `mouse_entered/exited` и сам зовёт `to_info_data()`.
+
+> **Правило:** новые спеллы/статусы получают tooltip автоматически. Хочешь дополнительные строки или другое описание — переопредели `to_info_data()` в подклассе и вызови `super.to_info_data()` для базы.
 
 ### 4.11. ArenaIcon
 
-`ArenaIcon` (`scripts/ui/arena_icon.gd`, `scenes/ui/arena_icon.tscn`) — кнопка 48×48 в левом верхнем углу экрана. Внутри сцены лежит инстанс `InfoPanel` (поле `info_panel_path`).
+`ArenaIcon` (`scripts/ui/arena_icon.gd`, `scenes/ui/arena_icon.tscn`) — кнопка 48×48 в левом верхнем углу экрана. Сама не владеет `InfoPanel` — пользуется общим через `CombatContext.info_panel` (см. §4.10).
 
 На `mouse_entered` строит `Dictionary` из `CombatContext.arena.def` и зовёт `info_panel.show_for(self, data)`. На `mouse_exited` — `hide_panel()`.
 
 Если `arena.def == null` или арена пустая — popup всё равно показывается с заглушкой «Plain arena. No special effects.»
 
-Подключается напрямую в `main.tscn` (не в `Hud`, потому что HUD прижат к низу экрана).
+Подключается напрямую в `main.tscn` (не в `Hud`, потому что HUD прижат к низу экрана). Арена не поддерживает `to_info_data()`-паттерн (как спеллы и статусы) — данные собирает сам `ArenaIcon` из `arena.def`.
 
 ### 4.12. CombatLog + LogButton (toggleable окно)
 
@@ -545,26 +576,34 @@ scripts/entities/env_object.gd
 - Если он нужен **только внутри одной сцены** — объяви его на ноде, не трогай EventBus.
 - Если его слушают разные подсистемы — добавь в `autoloads/event_bus.gd`. Тип параметра в `emit` обязан совпадать с объявлением (см. lessons.md).
 
-### ...hover-tooltip для статуса / заклинания / любого UI-элемента
+### ...hover-tooltip для статуса / заклинания
 
-1. Положи где-нибудь рядом инстанс `scenes/ui/info_panel.tscn` (или переиспользуй существующий, как `ArenaIcon`).
-2. Подпишись на `mouse_entered` / `mouse_exited` нужного контрола.
-3. На вход — собери `Dictionary` из ключей `title / icon / subtitle / description / lines` и вызови `info_panel.show_for(self, data)`.
+Уже работает автоматически через `to_info_data()` (см. §4.10a) — новые спеллы и статусы получают popup без правок UI. Хочешь свой контент — переопредели `to_info_data()` в подклассе и зови `super.to_info_data()`.
+
+Пример (свой статус):
+
+```
+extends StatusEffect
+
+func to_info_data() -> Dictionary:
+    var data: Dictionary = super.to_info_data()
+    data["icon"] = my_texture
+    data["description"] = "What this status does, plain prose."
+    data["lines"] = [
+        {"label": "Stacks", "value": str(stacks)},
+        {"label": "My field", "value": str(my_field)},
+    ]
+    return data
+```
+
+### ...hover-tooltip для произвольного UI-элемента
+
+Если нужен tooltip для чего-то, не являющегося спеллом или статусом (новая иконка на HUD, env-объект и т.п.):
+
+1. Подпишись на `mouse_entered` / `mouse_exited` нужного контрола.
+2. На вход — собери `Dictionary` из ключей `title / icon / subtitle / description / lines` и вызови `CombatContext.info_panel.show_for(self, data)`.
+3. На выход — `CombatContext.info_panel.hide_panel()`.
 4. Не пытайся позиционировать popup сам — `InfoPanel` сам найдёт место рядом с anchor и не выйдет за viewport.
-
-Пример (для статуса):
-
-```
-info_panel.show_for(self, {
-    "title": status.display_name,
-    "icon": status_icon_texture,
-    "subtitle": "Status",
-    "description": "...",
-    "lines": [
-        {"label": "Stacks", "value": str(status.stacks)},
-    ],
-})
-```
 
 ---
 

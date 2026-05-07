@@ -12,6 +12,34 @@ enum StackMode { DURATION, INTENSITY, REFRESH, UNIQUE }
 var stacks: int = 1
 var host: Node
 
+func _ready() -> void:
+    for child in get_children():
+        if child is Control:
+            (child as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+    mouse_entered.connect(_on_mouse_entered)
+    mouse_exited.connect(_on_mouse_exited)
+
+func to_info_data() -> Dictionary:
+    var lines: Array = []
+    if stacks > 0:
+        lines.append({"label": "Stacks", "value": str(stacks)})
+    return {
+        "title": display_name,
+        "subtitle": "Status",
+        "description": "",
+        "lines": lines,
+    }
+
+func _on_mouse_entered() -> void:
+    var panel: InfoPanel = CombatContext.info_panel
+    if panel:
+        panel.show_for(self, to_info_data())
+
+func _on_mouse_exited() -> void:
+    var panel: InfoPanel = CombatContext.info_panel
+    if panel:
+        panel.hide_panel()
+
 func on_apply() -> void:
     pass
 

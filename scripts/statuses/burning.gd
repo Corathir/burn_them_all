@@ -65,6 +65,17 @@ func calculate_collect_value() -> int:
     var coeff: float = COLLECT_COEFFICIENTS.get(stage, 0.0)
     return int(stored_reward * coeff)
 
+func to_info_data() -> Dictionary:
+    var data: Dictionary = super.to_info_data()
+    data["icon"] = STAGE_TEXTURES.get(stage)
+    data["description"] = "Burns the target. Cycles through stages each turn and weakens its attacks."
+    data["lines"] = [
+        {"label": "Stage", "value": STAGE_NAMES.get(stage, "")},
+        {"label": "Stored fuel", "value": str(stored_reward)},
+        {"label": "Collect coefficient", "value": str(COLLECT_COEFFICIENTS.get(stage, 0.0))},
+    ]
+    return data
+
 func modify_outgoing_damage(info: DamageInfo) -> void:
     if info.type != DamageInfo.Type.ATTACK:
         return

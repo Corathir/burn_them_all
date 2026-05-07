@@ -27,6 +27,13 @@ func modify_incoming_damage(info: DamageInfo) -> void:
     EventBus.log_entry.emit("Shield blocks the attack")
     (host as Combatant).statuses.remove_stack(id, 1)
 
+func to_info_data() -> Dictionary:
+    var data: Dictionary = super.to_info_data()
+    if icon and icon.texture:
+        data["icon"] = icon.texture
+    data["description"] = "Blocks the next incoming attack and consumes one charge."
+    return data
+
 func _update_visual() -> void:
     if charges_label:
         charges_label.text = str(stacks)

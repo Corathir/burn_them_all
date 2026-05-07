@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://cp1ay3rsc3n0" path="res://scenes/entities/player.tscn" id="6_player"]
 [ext_resource type="PackedScene" uid="uid://b4r3n41c0n1d" path="res://scenes/ui/arena_icon.tscn" id="7_arena_icon"]
 [ext_resource type="PackedScene" uid="uid://b1log8t0n1d77" path="res://scenes/ui/log_button.tscn" id="8_log_button"]
+[ext_resource type="PackedScene" uid="uid://b1nf0p4n3lu1d" path="res://scenes/ui/info_panel.tscn" id="9_info_panel"]
 
 [node name="Main" type="Node3D"]
 
@@ -47,3 +48,5 @@ offset_bottom = 408.0
 
 [node name="LogButton" parent="." instance=ExtResource("8_log_button")]
 combat_log_path = NodePath("../CombatLog")
+
+[node name="InfoPanel" parent="." instance=ExtResource("9_info_panel")]
