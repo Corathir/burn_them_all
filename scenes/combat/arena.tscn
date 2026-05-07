@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://car3n4nodec01"]
+
+[ext_resource type="Script" path="res://scripts/combat/arena.gd" id="1_arena"]
+[ext_resource type="Script" path="res://scripts/combat/status_container.gd" id="2_status_container"]
+
+[node name="Arena" type="Node"]
+script = ExtResource("1_arena")
+
+[node name="StatusContainer" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_status_container")
