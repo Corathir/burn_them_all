@@ -241,6 +241,45 @@ canceled     : bool           — true = удар не наносится
 
 Inventory сам отслеживает наложенные через него статусы и снимает их при unequip.
 
+### 4.10. InfoPanel — универсальный hover-popup
+
+`InfoPanel` (`scripts/ui/info_panel.gd`, `scenes/ui/info_panel.tscn`) — переиспользуемое всплывающее окно с информацией. Используется для арены, в будущем — для статусов и заклинаний.
+
+**Контракт:**
+
+```gdscript
+info_panel.show_for(anchor: Control, data: Dictionary)
+info_panel.hide_panel()
+```
+
+**Ключи `data`** (все опциональны, кроме `title`):
+
+- `title : String` — заголовок (имя арены/статуса/заклинания)
+- `icon : Texture2D` — иконка слева от заголовка
+- `subtitle : String` — приглушённый подзаголовок ("Status", "Spell", "Battlefield")
+- `description : String` — основной текст с автопереносом
+- `lines : Array[Dictionary]` — массив `{label, value}`-строк (например, `Heat cost: 20`, `Stage: Blazing`)
+
+**Позиционирование** (`_reposition_near`):
+
+1. По умолчанию справа от anchor с зазором 8 px, верхняя кромка по верху anchor.
+2. Если не лезет вправо → отзеркаливается влево.
+3. Если не лезет вниз → подтягивается вверх (низ совпадает с низом anchor).
+4. Финальный `clamp` обеих координат в пределах viewport с отступом 8 px.
+5. На время репозиционирования popup невидим (один кадр), чтобы не было «прыжка».
+
+> Используй `InfoPanel` вместо стандартных Godot-tooltip'ов везде, где нужна структурированная информация.
+
+### 4.11. ArenaIcon
+
+`ArenaIcon` (`scripts/ui/arena_icon.gd`, `scenes/ui/arena_icon.tscn`) — кнопка 48×48 в левом верхнем углу экрана. Внутри сцены лежит инстанс `InfoPanel` (поле `info_panel_path`).
+
+На `mouse_entered` строит `Dictionary` из `CombatContext.arena.def` и зовёт `info_panel.show_for(self, data)`. На `mouse_exited` — `hide_panel()`.
+
+Если `arena.def == null` или арена пустая — popup всё равно показывается с заглушкой «Plain arena. No special effects.»
+
+Подключается напрямую в `main.tscn` (не в `Hud`, потому что HUD прижат к низу экрана).
+
 ---
 
 ## 5. Главные механики
@@ -328,6 +367,8 @@ scripts/
     spell_button.gd              — отдельная кнопка заклинания
     stat_bar.gd                  — переиспользуемый ProgressBar+label
     combat_log.gd                — лог боя
+    info_panel.gd                — универсальный hover-popup (арена/статус/спелл)
+    arena_icon.gd                — иконка арены в левом верхнем углу + свой InfoPanel
 
 data/
   spells/    spark.tres, collect_heat.tres, heat_touch.tres, shield.tres
@@ -347,7 +388,11 @@ scenes/
     shield.tscn                  — Icon + ChargesLabel
   ui/
     hud.tscn, spell_panel.tscn, spell_button.tscn, stat_bar.tscn, combat_log.tscn
+    info_panel.tscn              — popup-панель (root: Control, mouse_filter=IGNORE)
+    arena_icon.tscn              — Button-иконка с встроенным InfoPanel
 ```
+
+`main.tscn` инстансит `arena_icon.tscn` рядом с `Hud` и `CombatLog`.
 
 Запланировано (ещё нет):
 
@@ -467,6 +512,27 @@ scripts/entities/env_object.gd
 
 - Если он нужен **только внутри одной сцены** — объяви его на ноде, не трогай EventBus.
 - Если его слушают разные подсистемы — добавь в `autoloads/event_bus.gd`. Тип параметра в `emit` обязан совпадать с объявлением (см. lessons.md).
+
+### ...hover-tooltip для статуса / заклинания / любого UI-элемента
+
+1. Положи где-нибудь рядом инстанс `scenes/ui/info_panel.tscn` (или переиспользуй существующий, как `ArenaIcon`).
+2. Подпишись на `mouse_entered` / `mouse_exited` нужного контрола.
+3. На вход — собери `Dictionary` из ключей `title / icon / subtitle / description / lines` и вызови `info_panel.show_for(self, data)`.
+4. Не пытайся позиционировать popup сам — `InfoPanel` сам найдёт место рядом с anchor и не выйдет за viewport.
+
+Пример (для статуса):
+
+```
+info_panel.show_for(self, {
+    "title": status.display_name,
+    "icon": status_icon_texture,
+    "subtitle": "Status",
+    "description": "...",
+    "lines": [
+        {"label": "Stacks", "value": str(status.stacks)},
+    ],
+})
+```
 
 ---
 

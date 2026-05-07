@@ -7,6 +7,7 @@
 [ext_resource type="Resource" uid="uid://bronnjjg6i4q4" path="res://data/enemies/skeleton.tres" id="4_lquwl"]
 [ext_resource type="PackedScene" uid="uid://dm0yxf8lvb5kv" path="res://scenes/ui/combat_log.tscn" id="5_combat_log"]
 [ext_resource type="PackedScene" uid="uid://cp1ay3rsc3n0" path="res://scenes/entities/player.tscn" id="6_player"]
+[ext_resource type="PackedScene" uid="uid://b4r3n41c0n1d" path="res://scenes/ui/arena_icon.tscn" id="7_arena_icon"]
 
 [node name="Main" type="Node3D"]
 
@@ -38,3 +39,5 @@ offset_left = 751.0
 offset_top = 6.0
 offset_right = 1151.0
 offset_bottom = 406.0
+
+[node name="ArenaIcon" parent="." instance=ExtResource("7_arena_icon")]

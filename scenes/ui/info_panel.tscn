@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://b1nf0p4n3lu1d"]
+
+[ext_resource type="Script" path="res://scripts/ui/info_panel.gd" id="1_script"]
+
+[node name="InfoPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Panel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 0.0
+offset_bottom = 0.0
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Header" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="TextureRect" parent="Panel/Margin/VBox/Header"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Panel/Margin/VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="SubtitleLabel" type="Label" parent="Panel/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+modulate = Color(0.75, 0.75, 0.75, 1)
+layout_mode = 2
+
+[node name="Separator" type="HSeparator" parent="Panel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DescriptionLabel" type="Label" parent="Panel/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="LinesContainer" type="VBoxContainer" parent="Panel/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 2
