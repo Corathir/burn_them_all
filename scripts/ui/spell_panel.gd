@@ -14,6 +14,10 @@ func _ready() -> void:
     end_turn_button.pressed.connect(_end_turn_pressed)
 
 func load_spells(spells: Array[SpellResource]):
+    for b in buttons:
+        b.queue_free()
+    buttons.clear()
+    selected_button = null
     for spell in spells:
         var spell_button: SpellButton = preload("res://scenes/ui/spell_button.tscn").instantiate()
         button_container.add_child(spell_button)
@@ -22,6 +26,10 @@ func load_spells(spells: Array[SpellResource]):
         spell_button.pressed_spell.connect(_on_spell_click)
         
 func _on_spell_click(spell: SpellResource):
+    if spell.target_type == SpellResource.TargetType.SELF:
+        EventBus.spell_cast.emit(spell)
+        return
+
     var clicked_button: SpellButton = null
     for button in buttons:
         if button.spell_resource == spell:

@@ -2,81 +2,72 @@ extends Node
 
 class_name CombatManager
 
-@onready var burning_system = $BurningSystem
+@onready var arena: Arena = $Arena
 
 var selected_spell: SpellResource
 
-var max_hp: int = 100
-var player_hp: int = 100
-var max_heat: int = 200
-var current_heat: int = 50
-
-func _ready():
-    EventBus.target_selected.connect(_click_enemy)
-    EventBus.spell_cast.connect(_spell_cast)
+func _ready() -> void:
+    EventBus.target_selected.connect(_on_target_selected)
+    EventBus.spell_cast.connect(_on_spell_cast)
     EventBus.turn_ended.connect(_end_player_turn)
-    _emit_initial_state.call_deferred()
+    _start_combat.call_deferred()
 
-func _emit_initial_state():
-    EventBus.combat_initialized.emit(max_hp, player_hp, max_heat, current_heat)
+func _start_combat() -> void:
+    if arena:
+        arena.enter_battle()
+    if CombatContext.player:
+        EventBus.turn_started.emit(CombatContext.player)
 
-func _spend_heat(amount: int):
-    current_heat -= amount
-    EventBus.heat_changed.emit(current_heat)
-
-func _gain_heat(amount: int):
-    current_heat += amount
-    EventBus.heat_changed.emit(current_heat)
-
-func _click_enemy(enemy: Enemy):
-    if (!selected_spell):
+func _on_spell_cast(spell: SpellResource) -> void:
+    selected_spell = null
+    if spell.target_type == SpellResource.TargetType.SELF:
+        if CombatContext.player and CombatContext.player.cast(spell, null):
+            EventBus.log_entry.emit(spell.spell_name + " (" + str(-1 * spell.heat_cost) + " Heat)")
+        EventBus.spell_resolved.emit()
         return
-
-    if selected_spell.ends_turn:
-        var heat_gained = burning_system.collect_heat(enemy)
-        if heat_gained <= 0:
-            EventBus.log_entry.emit("Cannot collect from " + enemy.enemy_data.enemy_name)
-            return
-        _gain_heat(heat_gained)
-        EventBus.log_entry.emit(selected_spell.spell_name + ' → ' + enemy.enemy_data.enemy_name + ' (+' + str(heat_gained) + ' Heat)')
-        selected_spell = null
-        EventBus.spell_resolved.emit()
-        _end_player_turn()
-    else:
-        _spend_heat(selected_spell.heat_cost)
-        if selected_spell.heat_reward > 0:
-            burning_system.ignite(enemy, selected_spell.heat_reward)
-        EventBus.log_entry.emit(selected_spell.spell_name + ' → ' + enemy.enemy_data.enemy_name + ' (' + str(-1 * selected_spell.heat_cost) + ' Heat)')
-        selected_spell = null
-        EventBus.spell_resolved.emit()
-
-func _spell_cast(spell: SpellResource):
     selected_spell = spell
 
-func _end_player_turn():
-    if current_heat > 100:
-        var overflow_damage = current_heat - 100
-        player_hp -= overflow_damage
-        EventBus.log_entry.emit("Heat overflow! Player takes " + str(overflow_damage) + " damage")
+func _on_target_selected(enemy) -> void:
+    if selected_spell == null:
+        return
+    if CombatContext.player == null:
+        return
+    var spell: SpellResource = selected_spell
+    var ok: bool = CombatContext.player.cast(spell, enemy)
+    selected_spell = null
+    EventBus.spell_resolved.emit()
+    if not ok:
+        return
+    if not spell.ends_turn and (spell.effects.is_empty() or _is_simple_damage(spell)):
+        var dmg_log: String = spell.spell_name + " → " + (enemy.display_name if enemy is Combatant else "?")
+        if spell.heat_cost > 0:
+            dmg_log += " (" + str(-1 * spell.heat_cost) + " Heat)"
+        EventBus.log_entry.emit(dmg_log)
+    if spell.ends_turn:
+        _end_player_turn()
 
-    burning_system.advance_all()
+func _is_simple_damage(_spell: SpellResource) -> bool:
+    return true
+
+func _end_player_turn() -> void:
+    if CombatContext.player == null:
+        return
+    EventBus.turn_ended_by.emit(CombatContext.player)
+    var p: Player = CombatContext.player as Player
+    if p and p.heat > 100:
+        var overflow: int = p.heat - 100
+        p.apply_raw_damage(overflow)
+        EventBus.log_entry.emit("Heat overflow! Player takes " + str(overflow) + " damage")
     _enemy_phase()
+    if CombatContext.player:
+        EventBus.turn_started.emit(CombatContext.player)
 
-func _enemy_phase():
-    var enemies = get_tree().get_nodes_in_group("enemies")
-
+func _enemy_phase() -> void:
+    var enemies: Array = CombatContext.enemies.duplicate()
     for enemy in enemies:
-        var burn_stage = burning_system.get_stage(enemy)
-        var damage = enemy.enemy_data.base_damage
-
-        match burn_stage:
-            burning_system.BurnStage.KINDLING, burning_system.BurnStage.FADING:
-                damage = int(damage * 0.5)
-            burning_system.BurnStage.BLAZING:
-                damage = 0
-
-        if damage > 0:
-            player_hp -= damage
-            EventBus.log_entry.emit(enemy.enemy_data.enemy_name + " attacks for " + str(damage) + " damage")
-        elif burn_stage == burning_system.BurnStage.BLAZING:
-            EventBus.log_entry.emit(enemy.enemy_data.enemy_name + " is Blazing - cannot attack!")
+        if not is_instance_valid(enemy) or enemy.hp <= 0:
+            continue
+        EventBus.turn_started.emit(enemy)
+        if enemy.hp > 0:
+            enemy.take_turn(CombatContext.player)
+        EventBus.turn_ended_by.emit(enemy)
