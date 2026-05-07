@@ -2,6 +2,7 @@ extends Resource
 
 class_name SpellResource
 
+@export var id: StringName
 @export var spell_name: String
 @export var heat_cost: int
 @export var heat_reward: int = 0
@@ -10,6 +11,8 @@ class_name SpellResource
 @export var target_type: TargetType
 @export var icon: Texture2D
 @export var icon_active: Texture2D
+@export var applies_status: PackedScene
+@export var effects: Array = []
 
 enum TargetType {
     SINGLE_ENEMY,
