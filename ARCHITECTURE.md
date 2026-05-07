@@ -340,6 +340,38 @@ API:
 
 Подключается в `main.tscn` (как `ArenaIcon`). `LogButton.combat_log_path = "../CombatLog"`.
 
+### 4.13. EnemyFormation — расстановка врагов по слотам
+
+Динамическая расстановка «N врагов в M рядов» оказалась слишком непредсказуемой для дизайна, поэтому формации **заданы как данные**: каждый бой выбирает готовую `FormationResource`, а энкаунтер решает, какие слоты занять.
+
+**Данные:**
+
+- `FormationSlot` (`scripts/resources/formation_slot.gd`) — `{ position: Vector2, row: int }`. `row` — для логики (AoE по ряду, line-of-sight) и z-порядка.
+- `FormationResource` (`scripts/resources/formation_resource.gd`) — `{ id, display_name, slots: Array[FormationSlot] }`.
+
+**Логика:**
+
+`EnemyFormation` (`scripts/combat/enemy_formation.gd`, `Control + script`) — `@export var formation: FormationResource`. На `_ready`:
+
+1. Для каждого ребёнка-`Enemy` ставит `enemy.position = formation.slots[enemy.slot_index].position`.
+2. Сортирует детей `move_child` по убыванию `slot.row` — задние ряды раньше в дереве → рисуются под передними.
+3. Если `slot_index` вне диапазона — `push_warning`, враг не двигается.
+
+**Enemy:** `@export var slot_index: int = 0` — индекс слота в текущей формации.
+
+**Готовые формации (`data/formations/`):**
+
+| Файл | Слоты 0–2 (`row=0` или `row=1`) | Слоты 3–4 |
+|---|---|---|
+| `front_heavy.tres` | передний ряд (3 слота, x=0/154/308, y=100) | задний (2 слота, x=77/231, y=0) |
+| `back_heavy.tres`  | задний ряд (3 слота, x=0/154/308, y=0)   | передний (2 слота, x=77/231, y=100) |
+
+Конвенция: индексы 0–2 — основной ряд (3 слота), 3–4 — вторичный (2 слота, между ними по горизонтали).
+
+**Пустые слоты — нормально.** Энкаунтер просто не кладёт врага в слот; layout его не использует. Текущий тестовый бой в `main.tscn` — `back_heavy` с двумя врагами в слотах 3 и 4 (передний ряд), задние три слота пустые.
+
+**Размеры:** контейнер 458×300, исходит из `enemy_slot.tscn` 150×200 + спейсинг 4 px между слотами и 100 px между рядами по Y.
+
 ---
 
 ## 5. Главные механики
@@ -396,6 +428,7 @@ scripts/
     status_container.gd          — управление статусами одного носителя
     status_effect.gd             — базовый класс статуса
     inventory.gd                 — слоты bound/accessory у игрока
+    enemy_formation.gd           — расставляет Enemy-детей по слотам формации
     damage_context.gd            — ЛЕГАСИ, не используется текущим пайплайном
     pipeline/
       damage_info.gd             — объект, текущий через систему урона
@@ -415,6 +448,8 @@ scripts/
     arena_battle_start_entry.gd  — запись «кому что навесить в начале боя»
     bound_item_resource.gd       — данные bound-предмета
     accessory_resource.gd        — данные аксессуара
+    formation_resource.gd        — формация: id, display_name, массив FormationSlot
+    formation_slot.gd            — слот формации: position, row
     effects/
       spell_effect_resource.gd   — базовый класс эффекта
       deal_damage_effect.gd
@@ -432,8 +467,9 @@ scripts/
     log_button.gd                — кнопка-открывалка лога в правом верхнем углу
 
 data/
-  spells/    spark.tres, collect_heat.tres, heat_touch.tres, shield.tres
-  enemies/   skeleton.tres
+  spells/      spark.tres, collect_heat.tres, heat_touch.tres, shield.tres
+  enemies/     skeleton.tres
+  formations/  front_heavy.tres (3F+2B), back_heavy.tres (3B+2F)
 
 scenes/
   combat/
@@ -558,6 +594,18 @@ scripts/entities/env_object.gd
 1. `data/enemies/<id>.tres` — `EnemyResource` (имя, HP, base_damage, заклинания, начальные статусы).
 2. По умолчанию враг будет инстансом `scenes/combat/enemy_slot.tscn` с подменённым `enemy_data` и (опционально) текстурой.
 3. Для уникального поведения — наследник `Enemy` с переопределённым `take_turn(target)` либо новый кастомный AI-статус.
+
+### ...новую формацию
+
+1. `data/formations/<id>.tres` — `FormationResource` с массивом `FormationSlot` (каждый: `position: Vector2`, `row: int`).
+2. Конвенция: чем больше `row`, тем дальше от камеры (рисуется раньше). Передний ряд — `row = 0`.
+3. Никакого кода трогать не нужно — `EnemyFormation` подхватит формацию и расставит детей по `slot_index`.
+
+### ...новый энкаунтер (бой)
+
+1. В сцене боя положи врагов внутрь `CombatArena/EnemyFormation` (см. `main.tscn`).
+2. Выстави `EnemyFormation.formation` на нужный `FormationResource`.
+3. Каждому врагу-инстансу проставь `slot_index` из выбранной формации. Незанятые слоты можно оставлять пустыми.
 
 ### ...новую арену
 

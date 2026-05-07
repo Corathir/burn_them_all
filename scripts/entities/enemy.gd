@@ -3,6 +3,7 @@ extends Combatant
 class_name Enemy
 
 @export var enemy_data: EnemyResource
+@export var slot_index: int = 0
 
 @onready var name_label: Label = $Column/NameLabel
 @onready var hp_bar: StatBar = $Column/HpBar
