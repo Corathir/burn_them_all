@@ -2,9 +2,23 @@ extends Control
 
 class_name EnemyFormation
 
+const ENEMY_SLOT_SCENE: PackedScene = preload("res://features/combatants/enemy/enemy_slot.tscn")
+
 @export var formation: FormationResource
 
 func _ready() -> void:
+    _layout()
+
+func populate(new_formation: FormationResource, entries: Array) -> void:
+    formation = new_formation
+    for child in get_children():
+        if child is Enemy:
+            child.queue_free()
+    for entry in entries:
+        var slot: Enemy = ENEMY_SLOT_SCENE.instantiate()
+        slot.slot_index = entry.get("slot_index", 0)
+        slot.enemy_data = entry.get("enemy_data")
+        add_child(slot)
     _layout()
 
 func _layout() -> void:

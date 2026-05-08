@@ -1,9 +1,6 @@
 [gd_scene format=3 uid="uid://gg3qnle0cdq4"]
 
 [ext_resource type="Script" uid="uid://cbj2a5jhr0ua0" path="res://features/combat/formation/enemy_formation.gd" id="1_formation"]
-[ext_resource type="Resource" uid="uid://bwbvdta3hbta3" path="res://features/combat/formation/back_heavy.tres" id="2_back_heavy"]
-[ext_resource type="PackedScene" uid="uid://btl1j5jcqo5u3" path="res://features/combatants/enemy/enemy_slot.tscn" id="3_enemy_slot"]
-[ext_resource type="Resource" uid="uid://bronnjjg6i4q4" path="res://features/combatants/enemy/skeleton/skeleton.tres" id="4_skeleton"]
 
 [node name="CombatArena" type="Control" unique_id=1956751420]
 layout_mode = 3
@@ -25,17 +22,6 @@ offset_right = 229.0
 offset_bottom = 360.0
 grow_horizontal = 2
 script = ExtResource("1_formation")
-formation = ExtResource("2_back_heavy")
-
-[node name="EnemySlot" parent="EnemyFormation" unique_id=2107012002 instance=ExtResource("3_enemy_slot")]
-layout_mode = 0
-enemy_data = ExtResource("4_skeleton")
-slot_index = 3
-
-[node name="EnemySlot2" parent="EnemyFormation" unique_id=1056754030 instance=ExtResource("3_enemy_slot")]
-layout_mode = 0
-enemy_data = ExtResource("4_skeleton")
-slot_index = 4
 
 [node name="EnvObjectContainer" type="HBoxContainer" parent="." unique_id=1064032313]
 layout_mode = 0
