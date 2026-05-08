@@ -137,6 +137,15 @@ intercept_status_change(req)        — перехват apply/remove/stacks (м
 - `BurningStatus` (`scripts/statuses/burning.gd`) — горение в 4 стадиях
 - `ShieldStatus`  (`scripts/statuses/shield.gd`) — поглощает следующий удар, тратит стак
 
+**Статусы-модификаторы предметов** (`scripts/statuses/*_mod.gd`) — невидимые статусы, которые навешивает `Inventory` при экипировке предмета. Все UNIQUE, `priority = 0`, без визуала (`visible = false` в сцене). Используются как hook'и в пайплайн каста:
+
+- `CollectGloveMod` — в `modify_pre_cast` ставит флаг в `info.extra_data` если у цели есть Burning; в `modify_post_cast` начисляет +5 Heat.
+- `SparkGloveMod` — в `modify_pre_cast` пишет `info.extra_data["heat_cost_delta"] = -10` для `spark`.
+- `HeatTouchHelmMod` — в `modify_pre_cast` дописывает в `info.effects` новый `DealDamageEffect(10, SPELL)` для `heat_touch`.
+- `MaxHeatMod` — в `on_apply` поднимает `Player.overflow_threshold` на +10, в `on_remove` опускает обратно.
+
+Шаблон: модификатор всегда фильтрует по `info.spell.id` и не трогает чужие касты.
+
 ### 4.5. Заклинания и эффекты (data-driven)
 
 `SpellResource` (`scripts/resources/spell_resource.gd`) — это **данные**:
@@ -189,6 +198,24 @@ Enemy.ClickArea.pressed
 
 > **Правило:** если хочешь добавить новое поведение заклинания — пиши **новый `SpellEffectResource`**. Не добавляй ветки `if spell.id == ...` в `CombatManager`.
 
+**Превью каста (для UI).** Чтобы UI мог показать результирующую стоимость и урон с учётом модификаторов, не запуская реальный каст:
+
+```
+Combatant.preview_spell(spell) -> SpellCastInfo
+```
+
+Создаёт пустой `SpellCastInfo` с копией `spell.effects`, прогоняет через `statuses.process_pre_cast` кастера и арены — **без** оплаты Heat и без `effect.execute`. Возвращает информационный объект, по которому можно прочитать:
+
+- `info.extra_data["heat_cost_delta"]` — суммарная дельта стоимости от всех модификаторов
+- `info.effects` — финальный список эффектов (с возможными добавками от модификаторов)
+
+Поверх этого:
+
+- `SpellResource.effective_heat_cost(caster)` → `max(0, heat_cost + delta)`. `SpellButton.init` показывает на иконке именно его.
+- `SpellResource.to_info_data(caster)` — в строке `Heat cost` пишет `"20 (-10)"`, в строке `Damage` — `"0 (+10)"` (база + дельта в скобках). Если модификатор отсутствует — просто база, без скобок. Дельту урона считает разностью `_sum_damage(info.effects) - _sum_damage(spell.effects)`.
+
+> **Важно:** `preview_spell` должен оставаться чистым (без побочных эффектов). Если пишешь модификатор статуса, который трогает что-то кроме `info.extra_data` / `info.effects` в `modify_pre_cast` — это сломает превью.
+
 ### 4.6. Урон (`DamageInfo`)
 
 `DamageInfo` (`scripts/combat/pipeline/damage_info.gd`) — RefCounted-объект, который течёт через статусы:
@@ -234,12 +261,79 @@ canceled     : bool           — true = удар не наносится
 
 ### 4.9. Inventory (только у игрока)
 
-`Inventory` (`scripts/combat/inventory.gd`) живёт под Player и управляет двумя видами слотов:
+`Inventory` (`scripts/combat/inventory.gd`) живёт под Player и управляет тремя видами хранилищ:
 
-- **Bound slots** — `BoundItemResource` модифицирует конкретное заклинание тем, что вешает на игрока `modifier_status`. Связь: `BoundItemResource.bound_spell_id == spell.id`.
-- **Accessory slots** — `AccessoryResource` может: добавить заклинание (`granted_spell`) и/или повесить пассивные статусы (`passive_statuses`).
+- **Bound slots** — `BoundItemResource` модифицирует конкретное заклинание тем, что вешает на игрока `modifier_status`. Связь: `BoundItemResource.bound_spell_id == spell.id`. Слот идентифицируется этим же id (`&"collect_heat"`, `&"spark"`, `&"heat_touch"`).
+- **Accessory slots** — `AccessoryResource` может добавить заклинание (`granted_spell`) и/или повесить пассивные статусы (`passive_statuses`). Слотов фиксировано 4, идентифицируются индексом.
+- **Backpack** — безразмерный `Array` неактивных предметов. Идентификатор — индекс в массиве.
 
-Inventory сам отслеживает наложенные через него статусы и снимает их при unequip.
+Inventory сам отслеживает наложенные через него статусы (через `_bound_status_refs` / `_accessory_status_refs`) и снимает их при unequip.
+
+**Единый API перемещения:**
+
+```
+Inventory.transfer(from_kind, from_key, to_kind, to_key) -> bool
+Inventory.toggle_equip(kind, key) -> bool
+```
+
+`transfer` обрабатывает три случая в одном месте:
+- Свободный слот назначения → просто переносит.
+- Занятый совместимый слот назначения и не-backpack источник → **swap** (предметы меняются местами).
+- Занятый совместимый слот и backpack-источник → старый предмет уезжает в backpack.
+
+Совместимость проверяется в `Inventory.is_compatible(kind, key, item)`:
+- BOUND принимает только `BoundItemResource` с `bound_spell_id == key`.
+- ACCESSORY принимает только `AccessoryResource`.
+- BACKPACK принимает что угодно.
+
+`toggle_equip` — короткий путь для ПКМ: из backpack → в первый подходящий пустой/совпадающий слот; из слота → в backpack.
+
+**Сигналы:** `Inventory.changed` (локальный) + `EventBus.bound_slot_equipped/unequipped`, `EventBus.accessory_slot_equipped/unequipped` (глобальные). UI слушает локальный `changed` и полностью перерисовывает окно.
+
+**Связь с UI заклинаний.** `Player._ready` подписывается на `Inventory.changed` и переэмитит `EventBus.spellbook_changed` с тем же списком спеллов. Это нужно, чтобы `SpellPanel` пересоздал кнопки и пересчитал effective-стоимости через `preview_spell` (см. §4.5). Спеллбук при экипировке/снятии bound-предмета не меняется — меняется набор статусов-модификаторов.
+
+#### 4.9.1. UI инвентаря
+
+```
+InventoryButton (Button "I", top-right, рядом с LogButton)
+    → InventoryWindow.open()
+
+InventoryWindow (Control)
+    Panel + CloseButton "×"
+    VBox
+      "Equipment"   — 3 InventorySlot (Left/Right/Head, kind=BOUND, bound_spell_id выставляется кодом)
+      "Accessories" — 4 InventorySlot (kind=ACCESSORY, slot_index=0..3)
+      "Backpack"    — ScrollContainer(InventoryBackpackDrop) → GridContainer → InventoryItemWidget × N
+```
+
+**`InventoryButton`** — зеркало `LogButton`, расположен слева от него (`offset_left = -112..-64`). Открывает `InventoryWindow`, прячется на время открытия, показывается обратно по сигналу `closed`.
+
+**`InventoryWindow`** — анкорится в правый верхний угол (тот же rect, что у `CombatLog`). Координаты слотов в `.tscn` примерные — компонуется через VBox/HBox.
+
+**`InventorySlot`** (`scripts/ui/inventory_slot.gd`) — экспортит `kind`, `bound_spell_id`/`slot_index`, `label_text`. Поведение:
+- ЛКМ-drag через `_get_drag_data` (preview-иконка 48×48).
+- Drop через `_can_drop_data` / `_drop_data` → `Inventory.transfer`.
+- ПКМ → `Inventory.toggle_equip`.
+- Hover → `CombatContext.info_panel.show_for(self, item.to_info_data())` если в слоте есть предмет.
+
+**`InventoryItemWidget`** (`scripts/ui/inventory_item_widget.gd`) — ячейка backpack. Может быть:
+- **Заполненной** (`backpack_index >= 0`, под этим индексом есть предмет): drag, ПКМ-toggle, hover-tooltip активны; иконка видна.
+- **Пустой** (`backpack_index < 0` или предмета нет): только принимает drop; видит placeholder `—`; никакого drag/ПКМ/tooltip.
+
+`InventoryWindow._rebuild_backpack` всегда рендерит `max(20, backpack.size() + 4)` ячеек, чтобы пустые места были видны и могли служить drop-целями.
+
+**`InventoryBackpackDrop`** (`scripts/ui/inventory_backpack_drop.gd`, `extends ScrollContainer`) — fallback drop-зона. Если drop попадает на щель между виджетами или в свободное место сетки (у `BackpackGrid` `mouse_filter = IGNORE`), событие достаётся ScrollContainer'у.
+
+#### 4.9.2. Описания предметов и tooltip
+
+`BoundItemResource` и `AccessoryResource` имеют поле `description: String` и реализуют `to_info_data()` по тому же контракту, что спеллы и статусы (см. §4.10a):
+
+```
+BoundItemResource.to_info_data() -> {title, icon, subtitle: "Bound Item", description, lines: []}
+AccessoryResource.to_info_data() -> {title, icon, subtitle: "Accessory", description, lines: []}
+```
+
+Это всё, что нужно — hover на слоте/виджете автоматически покажет popup. `InventorySlot` и `InventoryItemWidget` зовут `to_info_data()` через `has_method`-проверку, поэтому новые типы предметов получают tooltip без правок UI.
 
 ### 4.10. InfoPanel — универсальный hover-popup
 
@@ -276,7 +370,7 @@ info_panel.hide_panel()
 
 ### 4.10a. `to_info_data()` — паттерн «toString»
 
-`SpellResource` и `StatusEffect` определяют виртуальный метод
+`SpellResource`, `StatusEffect`, `BoundItemResource`, `AccessoryResource` определяют виртуальный метод
 
 ```
 func to_info_data() -> Dictionary
@@ -286,8 +380,10 @@ func to_info_data() -> Dictionary
 
 **Базовые реализации:**
 
-- `SpellResource.to_info_data()` — `{title: spell_name, icon, subtitle: "Spell", description, lines: [Heat cost / Heat reward / Ends turn]}`. У спеллов нет наследников (поведение собирается из `effects`), поэтому метод финальный по факту.
+- `SpellResource.to_info_data(caster: Combatant = null)` — `{title: spell_name, icon, subtitle: "Spell", description, lines: [Heat cost / Heat reward / Damage / Ends turn]}`. Если передан `caster`, прогоняет `caster.preview_spell(self)` и форматирует строки `Heat cost` и `Damage` как `"<base> (<delta>)"` (база + дельта в скобках). Если дельта = 0 — пишет просто число. См. §4.5.
 - `StatusEffect.to_info_data()` — `{title: display_name, subtitle: "Status", lines: [Stacks]}`. Подклассы переопределяют.
+- `BoundItemResource.to_info_data()` — `{title: display_name, icon, subtitle: "Bound Item", description, lines: []}`.
+- `AccessoryResource.to_info_data()` — `{title: display_name, icon, subtitle: "Accessory", description, lines: []}`.
 
 **Текущие override'ы:**
 
@@ -296,10 +392,11 @@ func to_info_data() -> Dictionary
 
 **Кто рисует:**
 
-- `SpellButton.init()` подключает `click_area.mouse_entered/exited` и зовёт `info_panel.show_for(self, spell.to_info_data())`.
+- `SpellButton.init()` подключает `click_area.mouse_entered/exited` и зовёт `info_panel.show_for(self, spell.to_info_data(CombatContext.player))` — caster пробрасывается, чтобы tooltip показал модификаторы предметов.
 - `StatusEffect._ready()` (база) — выставляет всем дочерним `Control` `mouse_filter = IGNORE` (чтобы лейбл/иконка не перехватывали hover у корня), подключает свой `mouse_entered/exited` и сам зовёт `to_info_data()`.
+- `InventorySlot` / `InventoryItemWidget` — на `mouse_entered` достают предмет через `inventory.peek(...)` и зовут `info_panel.show_for(self, item.to_info_data())`. Через `has_method("to_info_data")` — для будущих типов предметов работает автоматически.
 
-> **Правило:** новые спеллы/статусы получают tooltip автоматически. Хочешь дополнительные строки или другое описание — переопредели `to_info_data()` в подклассе и вызови `super.to_info_data()` для базы.
+> **Правило:** новые спеллы/статусы/предметы получают tooltip автоматически. Хочешь дополнительные строки или другое описание — переопредели `to_info_data()` в подклассе и вызови `super.to_info_data()` для базы.
 
 ### 4.11. ArenaIcon
 
@@ -441,6 +538,10 @@ scripts/
   statuses/
     burning.gd                   — горение
     shield.gd                    — щит
+    collect_glove_mod.gd         — +5 Heat при сборе с горящего (модификатор collect_heat)
+    spark_glove_mod.gd           — -10 Heat стоимость spark
+    heat_touch_helm_mod.gd       — +10 урона heat_touch
+    max_heat_mod.gd              — +10 к Player.overflow_threshold
   resources/
     spell_resource.gd            — данные заклинания
     enemy_resource.gd            — данные врага
@@ -462,14 +563,22 @@ scripts/
     spell_button.gd              — отдельная кнопка заклинания
     stat_bar.gd                  — переиспользуемый ProgressBar+label
     combat_log.gd                — окно лога боя (open/close + сигнал closed)
-    info_panel.gd                — универсальный hover-popup (арена/статус/спелл)
+    info_panel.gd                — универсальный hover-popup (арена/статус/спелл/предмет)
     arena_icon.gd                — иконка арены в левом верхнем углу + свой InfoPanel
     log_button.gd                — кнопка-открывалка лога в правом верхнем углу
+    inventory_button.gd          — кнопка-открывалка инвентаря (слева от LogButton)
+    inventory_window.gd          — окно инвентаря (equipment + accessories + backpack)
+    inventory_slot.gd            — слот для bound/accessory: drag/drop, ПКМ-toggle, hover
+    inventory_item_widget.gd     — ячейка backpack (заполненная или пустая drop-цель)
+    inventory_backpack_drop.gd   — fallback drop-зона на пустое место сетки backpack
 
 data/
   spells/      spark.tres, collect_heat.tres, heat_touch.tres, shield.tres
   enemies/     skeleton.tres
   formations/  front_heavy.tres (3F+2B), back_heavy.tres (3B+2F)
+  items/
+    bound/        glove_collect.tres, glove_spark.tres, helm_heat_touch.tres
+    accessories/  amulet_max_heat.tres
 
 scenes/
   combat/
@@ -483,15 +592,23 @@ scenes/
   statuses/
     burning.tscn                 — Icon + RewardLabel
     shield.tscn                  — Icon + ChargesLabel
+    collect_glove_mod.tscn       — невидимый статус-модификатор collect_heat
+    spark_glove_mod.tscn         — невидимый статус-модификатор spark
+    heat_touch_helm_mod.tscn     — невидимый статус-модификатор heat_touch
+    max_heat_mod.tscn            — невидимый статус, поднимающий overflow_threshold
   ui/
     hud.tscn, spell_panel.tscn, spell_button.tscn, stat_bar.tscn
     combat_log.tscn              — Control + Panel + ScrollContainer + CloseButton
     info_panel.tscn              — popup-панель (root: Control, mouse_filter=IGNORE)
     arena_icon.tscn              — Button-иконка с встроенным InfoPanel
     log_button.tscn              — Button-иконка справа сверху, открывает CombatLog
+    inventory_button.tscn        — Button-иконка слева от LogButton, открывает InventoryWindow
+    inventory_window.tscn        — окно инвентаря: equipment-bar / accessory-bar / backpack-grid
+    inventory_slot.tscn          — Control 64×80: Bg + Icon + EmptyText + Label
+    inventory_item_widget.tscn   — Control 56×56: Bg + Icon + EmptyText "—"
 ```
 
-`main.tscn` инстансит `arena_icon.tscn` (top-left) и `log_button.tscn` (top-right) рядом с `Hud` и `CombatLog`. `CombatLog` теперь анкорится в правый верхний угол экрана (offset 8 px), чтобы `×` внутри лога совпал с `LogButton` экранными координатами.
+`main.tscn` инстансит `arena_icon.tscn` (top-left), `log_button.tscn` (top-right) и `inventory_button.tscn` (top-right, левее лога) рядом с `Hud`, `CombatLog` и `InventoryWindow`. `CombatLog` и `InventoryWindow` анкорятся в одинаковый rect (правый верхний угол, offset 8 px), чтобы `×` внутри окна совпадал с соответствующей открывающей кнопкой по экранным координатам.
 
 Запланировано (ещё нет):
 
@@ -615,9 +732,24 @@ scripts/entities/env_object.gd
 
 ### ...новый bound-предмет / аксессуар
 
-- Bound: `data/items/bound/<id>.tres` (`BoundItemResource`) с `bound_spell_id` и `modifier_status`. Экипируется через `Inventory.equip_bound(spell_id, item)`.
-- Accessory: `data/items/accessories/<id>.tres` (`AccessoryResource`) с `granted_spell` и/или `passive_statuses`. Экипируется через `Inventory.equip_accessory(slot_index, accessory)`.
-- Снятие — `unequip_bound` / `unequip_accessory`. Inventory сам уберёт статусы и заклинания, навешенные через него.
+**Bound-предмет (модифицирует конкретное заклинание):**
+
+1. Напиши статус-модификатор: `scripts/statuses/<имя>_mod.gd` (наследник `StatusEffect`, `stack_mode = UNIQUE`, `priority = 0`). Фильтруй по `info.spell.id` и не трогай чужие касты. Хуки на выбор: `modify_pre_cast` (правит cost через `info.extra_data["heat_cost_delta"]`, добавляет эффекты в `info.effects`), `modify_post_cast`, `on_apply` / `on_remove` (для пассивных характеристик типа `overflow_threshold`).
+2. Сцена `scenes/statuses/<имя>_mod.tscn` — `Control` со скриптом, `visible = false` (модификатор предмета невидим — иконку показывает сам слот инвентаря).
+3. `data/items/bound/<id>.tres` (`BoundItemResource`): `id`, `display_name`, `description`, `icon`, `bound_spell_id` (id заклинания, к которому привязан слот), `modifier_status` (PackedScene из шага 2).
+4. `Inventory` сам наложит/снимет статус через `equip_bound` / `unequip_bound`. Чтобы предмет был у игрока со старта — добавь в `Player.inventory.initial_bound` (или в `initial_backpack`) в `scenes/entities/player.tscn`.
+
+**Accessory:**
+
+1. `data/items/accessories/<id>.tres` (`AccessoryResource`): `id`, `display_name`, `description`, `icon`, опционально `granted_spell` (`SpellResource`) и/или `passive_statuses` (`Array[PackedScene]` для постоянных бафов).
+2. Если нужен пассивный эффект — пиши обычный статус (`StatusEffect`), необязательно невидимый. Накладывается через `passive_statuses`.
+3. Со старта — `Player.inventory.initial_accessories` (макс 4). Снятие/экипировка — через окно инвентаря (ПКМ или drag).
+
+**Помни:**
+
+- `description` поле обязательно — попадает в hover-tooltip предмета через `to_info_data()`.
+- Превью каста (`Combatant.preview_spell`) запускает `modify_pre_cast` без оплаты Heat. Не делай в этом хуке ничего, что меняет состояние игры (логирование, изменение HP/Heat, наложение статусов и т.п.) — только мутации `info`.
+- При экипировке/снятии `Inventory.changed` → `Player` переэмитит `spellbook_changed` → `SpellPanel` пересоздаст кнопки. Эффективные стоимости и tooltip пересчитаются автоматически.
 
 ### ...новый сигнал
 
