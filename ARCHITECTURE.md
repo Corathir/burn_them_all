@@ -585,7 +585,7 @@ scenes/
     combat_arena.tscn            — корневая сцена боя (контейнеры для врагов и env-объектов)
     combat_manager.tscn
     arena.tscn
-    enemy_slot.tscn              — экземпляр врага (StatusContainer + Spellbook + ClickArea)
+    enemy_slot.tscn              — экземпляр врага: Column(NameLabel/HpBar/StatusContainer) + TextureRect + ClickArea (только под Column, чтобы не перехватывать hover статусов)
     inventory.tscn
   entities/
     player.tscn                  — игрок (StatusContainer + Spellbook + Inventory)
@@ -796,6 +796,7 @@ func to_info_data() -> Dictionary:
 - **Статусы — `Control`-сцены.** Они отображаются в `StatusContainer` (HBox), поэтому имеют размеры и могут влиять на layout.
 - **DamageContext (`scripts/combat/damage_context.gd`) — легаси.** Текущий пайплайн использует `DamageInfo`. Не подключай старый класс к новому коду.
 - **HUD не загружает спеллы.** Он только слушает `spellbook_changed`. Чтобы спелл появился у игрока — добавь его в `Player.basic_spells` (или через Inventory/Spellbook в рантайме).
+- **`ClickArea` врага не должен накрывать `StatusContainer`.** В `enemy_slot.tscn` `ClickArea` (Button с `mouse_filter = STOP`) перехватывает все hover-события в своём rect. Если он накроет область статусов — `StatusEffect.mouse_entered` никогда не сработает и tooltip статуса не покажется. Текущая раскладка: `ClickArea` анкорится только под `Column` (`offset_top = 81`), а `TextureRect` имеет `mouse_filter = IGNORE`, чтобы его перекрытие с низом колонки не глотало hover статусов. Если меняешь высоту `Column` — синхронизируй `offset_top` у `ClickArea`.
 
 ---
 
