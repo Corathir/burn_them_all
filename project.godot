@@ -18,7 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 EventBus="*uid://dpoe4c5xhhd8p"
-CombatContext="*res://autoloads/combat_context.gd"
+CombatContext="*res://features/core/combat_context.gd"
 
 [editor_plugins]
 

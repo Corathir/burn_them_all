@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="FormationResource" format=3 uid="uid://b1f0rmfh01"]
+
+[ext_resource type="Script" uid="uid://dj4bkcl4x7yai" path="res://features/combat/formation/formation_resource.gd" id="1_resource"]
+[ext_resource type="Script" uid="uid://duha0w1f661t2" path="res://features/combat/formation/formation_slot.gd" id="2_slot"]
+
+[sub_resource type="Resource" id="Resource_slot_0"]
+script = ExtResource("2_slot")
+position = Vector2(0, 100)
+
+[sub_resource type="Resource" id="Resource_slot_1"]
+script = ExtResource("2_slot")
+position = Vector2(154, 100)
+
+[sub_resource type="Resource" id="Resource_slot_2"]
+script = ExtResource("2_slot")
+position = Vector2(308, 100)
+
+[sub_resource type="Resource" id="Resource_slot_3"]
+script = ExtResource("2_slot")
+position = Vector2(77, 0)
+row = 1
+
+[sub_resource type="Resource" id="Resource_slot_4"]
+script = ExtResource("2_slot")
+position = Vector2(231, 0)
+row = 1
+
+[resource]
+script = ExtResource("1_resource")
+id = &"front_heavy"
+display_name = "3 Front + 2 Back"
+slots = Array[ExtResource("2_slot")]([SubResource("Resource_slot_0"), SubResource("Resource_slot_1"), SubResource("Resource_slot_2"), SubResource("Resource_slot_3"), SubResource("Resource_slot_4")])

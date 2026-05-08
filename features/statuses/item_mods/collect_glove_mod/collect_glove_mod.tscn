@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://b1mod0c0llect"]
+
+[ext_resource type="Script" path="res://features/statuses/item_mods/collect_glove_mod/collect_glove_mod.gd" id="1_mod_collect"]
+
+[node name="CollectGloveMod" type="Control"]
+visible = false
+custom_minimum_size = Vector2(0, 0)
+script = ExtResource("1_mod_collect")

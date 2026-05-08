@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://b1mod0sp4rkgl"]
-
-[ext_resource type="Script" path="res://scripts/statuses/spark_glove_mod.gd" id="1_mod_spark"]
-
-[node name="SparkGloveMod" type="Control"]
-visible = false
-custom_minimum_size = Vector2(0, 0)
-script = ExtResource("1_mod_spark")

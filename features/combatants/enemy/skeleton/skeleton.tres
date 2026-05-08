@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EnemyResource" format=3 uid="uid://bronnjjg6i4q4"]
+
+[ext_resource type="Script" uid="uid://doxsec0f682yl" path="res://features/combatants/enemy/enemy_resource.gd" id="1_k7ddm"]
+[ext_resource type="Script" uid="uid://dfci4odqknqky" path="res://features/spells/spell_resource.gd" id="2_6b0j5"]
+
+[resource]
+script = ExtResource("1_k7ddm")
+enemy_name = "Skeleton"
+max_hp = 40
+base_damage = 8

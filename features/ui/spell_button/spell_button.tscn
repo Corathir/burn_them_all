@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://ppnbswqhxoij"]
+
+[ext_resource type="Script" uid="uid://xnteiq0ru1dy" path="res://features/ui/spell_button/spell_button.gd" id="1_b5kpl"]
+
+[node name="SpellButton" type="Control" unique_id=1853712451]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 8.0
+offset_bottom = 50.0
+size_flags_vertical = 3
+script = ExtResource("1_b5kpl")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1672907061]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 3
+
+[node name="IconActive" type="TextureRect" parent="." unique_id=733958567]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 3
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=1586507961]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NameLabel" type="Label" parent="Column" unique_id=707265615]
+visible = false
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="CostLabel" type="Label" parent="Column" unique_id=1275518961]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Overlay" type="ColorRect" parent="." unique_id=1045586571]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.49803922)
+
+[node name="ClickArea" type="Button" parent="." unique_id=1633842571]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true

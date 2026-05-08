@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://b1mod0maxht"]
-
-[ext_resource type="Script" path="res://scripts/statuses/max_heat_mod.gd" id="1_mod_maxheat"]
-
-[node name="MaxHeatMod" type="Control"]
-visible = false
-custom_minimum_size = Vector2(0, 0)
-script = ExtResource("1_mod_maxheat")

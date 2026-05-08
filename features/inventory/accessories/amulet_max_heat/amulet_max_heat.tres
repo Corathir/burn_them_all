@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AccessoryResource" format=3 uid="uid://b1accmaxheat"]
+
+[ext_resource type="Script" uid="uid://c5e8t82uyogd2" path="res://features/inventory/accessory_resource.gd" id="1_acc"]
+[ext_resource type="Texture2D" uid="uid://syw4ultofwib" path="res://features/spells/shield/shield.svg" id="2_icon"]
+[ext_resource type="PackedScene" uid="uid://b1mod0maxht" path="res://features/statuses/item_mods/max_heat_mod/max_heat_mod.tscn" id="3_status"]
+
+[resource]
+script = ExtResource("1_acc")
+id = &"amulet_max_heat"
+display_name = "Heat Amulet"
+description = "+10 to safe Heat threshold (raises overflow cap to 110)."
+icon = ExtResource("2_icon")
+passive_statuses = Array[PackedScene]([ExtResource("3_status")])

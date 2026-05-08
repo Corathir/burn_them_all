@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BoundItemResource" format=3 uid="uid://b1bndglovcoll"]
+
+[ext_resource type="Script" uid="uid://bfk1co73h3vl0" path="res://features/inventory/bound_item_resource.gd" id="1_bnd_item"]
+[ext_resource type="Texture2D" uid="uid://32j7415lu0b8" path="res://features/spells/collect_heat/collect_heat.svg" id="2_icon"]
+[ext_resource type="PackedScene" uid="uid://b1mod0c0llect" path="res://features/statuses/item_mods/collect_glove_mod/collect_glove_mod.tscn" id="3_status"]
+
+[resource]
+script = ExtResource("1_bnd_item")
+id = &"glove_collect"
+display_name = "Collector's Glove"
+description = "+5 Heat when Collect Heat reaps a burning enemy."
+icon = ExtResource("2_icon")
+bound_spell_id = &"collect_heat"
+modifier_status = ExtResource("3_status")
