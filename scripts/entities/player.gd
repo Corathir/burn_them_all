@@ -7,6 +7,7 @@ class_name Player
 @export var basic_spells: Array[SpellResource] = []
 
 var heat: int
+var overflow_threshold: int = 100
 
 @onready var inventory: Inventory = %Inventory
 
@@ -17,16 +18,23 @@ func _ready() -> void:
     add_to_group("player_carrier")
     for spell in basic_spells:
         spellbook.add_spell(spell)
+    inventory.apply_initial_loadout()
+    inventory.changed.connect(_on_inventory_changed)
     _emit_initial_state.call_deferred()
+
+func _on_inventory_changed() -> void:
+    EventBus.spellbook_changed.emit(self, spellbook.spells)
 
 func _emit_initial_state() -> void:
     EventBus.combat_initialized.emit(max_hp, hp, max_heat, heat)
     EventBus.spellbook_changed.emit(self, spellbook.spells)
 
-func _try_pay_cost(spell: SpellResource) -> bool:
-    if heat < spell.heat_cost:
+func _try_pay_cost(info: SpellCastInfo) -> bool:
+    var cost: int = info.spell.heat_cost + int(info.extra_data.get("heat_cost_delta", 0))
+    cost = max(0, cost)
+    if heat < cost:
         return false
-    heat -= spell.heat_cost
+    heat -= cost
     EventBus.heat_changed.emit(heat)
     return true
 

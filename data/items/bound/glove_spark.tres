@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BoundItemResource" format=3 uid="uid://b1bndglovsprk"]
+
+[ext_resource type="Script" uid="uid://bfk1co73h3vl0" path="res://scripts/resources/bound_item_resource.gd" id="1_bnd_item"]
+[ext_resource type="Texture2D" uid="uid://dkp2cl1buhc4r" path="res://assets/spells/spark.svg" id="2_icon"]
+[ext_resource type="PackedScene" uid="uid://b1mod0sp4rkgl" path="res://scenes/statuses/spark_glove_mod.tscn" id="3_status"]
+
+[resource]
+script = ExtResource("1_bnd_item")
+id = &"glove_spark"
+display_name = "Spark Glove"
+description = "Spark costs 10 less Heat to cast."
+icon = ExtResource("2_icon")
+bound_spell_id = &"spark"
+modifier_status = ExtResource("3_status")

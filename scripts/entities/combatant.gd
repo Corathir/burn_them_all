@@ -41,6 +41,18 @@ func deal_damage(target: Combatant, base: int, type: int, ability_id: StringName
             s.on_damage_taken(info)
     return info
 
+func preview_spell(spell: SpellResource) -> SpellCastInfo:
+    var info := SpellCastInfo.new()
+    info.spell = spell
+    info.caster = self
+    info.target = null
+    info.effects = spell.effects.duplicate()
+    if statuses:
+        statuses.process_pre_cast(info)
+    if CombatContext.arena and not info.canceled:
+        CombatContext.arena.statuses.process_pre_cast(info)
+    return info
+
 func cast(spell: SpellResource, target: Combatant) -> bool:
     var info := SpellCastInfo.new()
     info.spell = spell
@@ -58,7 +70,7 @@ func cast(spell: SpellResource, target: Combatant) -> bool:
         EventBus.spell_canceled.emit(info)
         return false
 
-    if not _try_pay_cost(spell):
+    if not _try_pay_cost(info):
         return false
 
     for effect in info.effects:
@@ -73,5 +85,5 @@ func cast(spell: SpellResource, target: Combatant) -> bool:
 func apply_raw_damage(amount: int) -> void:
     hp = max(0, hp - amount)
 
-func _try_pay_cost(_spell: SpellResource) -> bool:
+func _try_pay_cost(_info: SpellCastInfo) -> bool:
     return true

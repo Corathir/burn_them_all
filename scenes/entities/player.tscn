@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cp1ay3rsc3n0"]
+[gd_scene load_steps=13 format=3 uid="uid://cp1ay3rsc3n0"]
 
 [ext_resource type="Script" path="res://scripts/entities/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/combat/status_container.gd" id="2_status_container"]
@@ -8,6 +8,10 @@
 [ext_resource type="Resource" uid="uid://cv6cxhqgnku1i" path="res://data/spells/heat_touch.tres" id="6_heat_touch"]
 [ext_resource type="Resource" uid="uid://xeotkwgeowlu" path="res://data/spells/collect_heat.tres" id="7_collect_heat"]
 [ext_resource type="Resource" uid="uid://dn7r5xkmqp2wb" path="res://data/spells/shield.tres" id="8_shield"]
+[ext_resource type="Resource" uid="uid://b1bndglovcoll" path="res://data/items/bound/glove_collect.tres" id="9_glove_collect"]
+[ext_resource type="Resource" uid="uid://b1bndglovsprk" path="res://data/items/bound/glove_spark.tres" id="10_glove_spark"]
+[ext_resource type="Resource" uid="uid://b1bndhelmht" path="res://data/items/bound/helm_heat_touch.tres" id="11_helm_heat_touch"]
+[ext_resource type="Resource" uid="uid://b1accmaxheat" path="res://data/items/accessories/amulet_max_heat.tres" id="12_amulet_max_heat"]
 
 [node name="Player" type="Control"]
 script = ExtResource("1_player")
@@ -27,3 +31,5 @@ script = ExtResource("3_spellbook")
 
 [node name="Inventory" parent="." instance=ExtResource("4_inventory")]
 unique_name_in_owner = true
+initial_bound = Array[Resource]([ExtResource("9_glove_collect"), ExtResource("10_glove_spark"), ExtResource("11_helm_heat_touch")])
+initial_accessories = Array[Resource]([ExtResource("12_amulet_max_heat")])

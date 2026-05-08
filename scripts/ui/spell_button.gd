@@ -17,10 +17,10 @@ signal pressed_spell(spell_res)
 
 func init(spell: SpellResource):
     name_label.text = spell.spell_name
-    cost_label.text = str(spell.heat_cost)
     spell_name = spell.spell_name
-    heat_cost = spell.heat_cost
     spell_resource = spell
+    heat_cost = spell.effective_heat_cost(CombatContext.player)
+    cost_label.text = str(heat_cost)
     icon.texture = spell.icon
     icon_active.texture = spell.icon_active
     click_area.pressed.connect(_on_click)
@@ -42,7 +42,7 @@ func _on_click():
 func _on_mouse_entered() -> void:
     var panel: InfoPanel = CombatContext.info_panel
     if panel and spell_resource:
-        panel.show_for(self, spell_resource.to_info_data())
+        panel.show_for(self, spell_resource.to_info_data(CombatContext.player))
 
 func _on_mouse_exited() -> void:
     var panel: InfoPanel = CombatContext.info_panel

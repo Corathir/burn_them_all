@@ -17,7 +17,7 @@ func _ready() -> void:
 func _on_combat_initialized(max_hp: int, hp: int, max_heat: int, heat: int) -> void:
     hp_bar.init(max_hp, hp)
     heat_bar.init(max_heat, heat)
-    overflow_warning.visible = heat > 80
+    overflow_warning.visible = heat > _warn_at()
     _host_player_statuses()
 
 func _host_player_statuses() -> void:
@@ -33,7 +33,13 @@ func _host_player_statuses() -> void:
 
 func _on_heat_changed(heat: int) -> void:
     heat_bar.update_value(heat)
-    overflow_warning.visible = heat > 80
+    overflow_warning.visible = heat > _warn_at()
+
+func _warn_at() -> int:
+    var threshold: int = 100
+    if CombatContext.player:
+        threshold = CombatContext.player.overflow_threshold
+    return threshold - 20
 
 func _on_player_hp_changed(hp: int) -> void:
     hp_bar.update_value(hp)

@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://b1mod0htouch"]
+
+[ext_resource type="Script" path="res://scripts/statuses/heat_touch_helm_mod.gd" id="1_mod_helm"]
+
+[node name="HeatTouchHelmMod" type="Control"]
+visible = false
+custom_minimum_size = Vector2(0, 0)
+script = ExtResource("1_mod_helm")

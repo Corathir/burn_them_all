@@ -54,8 +54,8 @@ func _end_player_turn() -> void:
         return
     EventBus.turn_ended_by.emit(CombatContext.player)
     var p: Player = CombatContext.player as Player
-    if p and p.heat > 100:
-        var overflow: int = p.heat - 100
+    if p and p.heat > p.overflow_threshold:
+        var overflow: int = p.heat - p.overflow_threshold
         p.apply_raw_damage(overflow)
         EventBus.log_entry.emit("Heat overflow! Player takes " + str(overflow) + " damage")
     _enemy_phase()
