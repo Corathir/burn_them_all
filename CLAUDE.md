@@ -11,16 +11,16 @@ Detailed reference: `ARCHITECTURE.md`. Lessons / past mistakes: `.claude/lessons
 - `snake_case` files, `PascalCase` nodes, 4-space indent (no tabs).
 - `%NodeName` access requires "Unique Name in Owner" on the node.
 - `class_name` is global — never reuse names.
-- Custom resources in `scripts/resources/`, data `.tres` in `data/`. No `@onready` in `Resource`.
-- Global signals in `autoloads/event_bus.gd`. Local signals stay on the node.
+- Project is **vertical-sliced** under `features/`: one feature = one folder. Base classes live one level up. No separate `scripts/`, `scenes/`, `data/`, `assets/` folders. No `@onready` in `Resource`.
+- Global signals + autoloads in `features/core/`. Local signals stay on the node.
 
 ## Layered separation
 
-| Layer   | Folder                                                | Allowed                              |
-|---------|-------------------------------------------------------|--------------------------------------|
-| Data    | `scripts/resources/`, `data/`                         | Values, scene refs                   |
-| Logic   | `scripts/combat/`, `entities/`, `statuses/`           | Game state, no UI calls              |
-| Display | `scripts/ui/`                                         | Subscribes to signals; no game state |
+| Layer   | Folder                                                       | Allowed                              |
+|---------|--------------------------------------------------------------|--------------------------------------|
+| Data    | `*Resource.gd` + `.tres` (inside each feature folder)        | Values, scene refs                   |
+| Logic   | `features/{core, combat, combatants, statuses, inventory}/`  | Game state, no UI calls              |
+| Display | `features/ui/`, `features/inventory/ui/`                     | Subscribes to signals; no game state |
 
 UI never owns truth. `hud.gd` doesn't load spells — it reacts to `spellbook_changed`.
 
@@ -68,7 +68,7 @@ Inside `cast()`: `process_pre_cast` → `_try_pay_cost` (Player charges Heat) �
 |---------------------|------------------------------------------------------------|
 | `DealDamageEffect`  | `caster.deal_damage(target, amount, type, spell.id)`       |
 | `ApplyStatusEffect` | applies `status_scene` to target (or caster if `apply_to_self`) |
-| `IgniteEffect`      | applies `burning.tscn` with `reward` stacks                |
+| `BurningEffect`     | applies `burning.tscn` with `reward` stacks                |
 | `CollectHeatEffect` | reads `BurningStatus`, awards Heat, removes status         |
 
 Add new behavior by writing a new `SpellEffectResource` subclass — **do not** branch on `spell.id` in `CombatManager`.
@@ -103,7 +103,7 @@ Statuses run in descending `priority`. `stack_mode`: `DURATION`, `INTENSITY`, `R
 
 - `BurningStatus` — 4-stage burn cycle (see Mechanics).
 - `ShieldStatus` — absorbs next attack, consumes a stack.
-- `CollectGloveMod` / `SparkGloveMod` / `HeatTouchHelmMod` / `MaxHeatMod` — invisible item-modifier statuses (see Inventory).
+- `CollectGloveMod` / `SparkGloveMod` / `HeatTouchHelmMod` / `MaxHeatMod` — invisible item-modifier statuses, live under `features/statuses/item_mods/` (see Inventory).
 
 ### Pipeline objects (RefCounted)
 
@@ -114,6 +114,19 @@ Statuses run in descending `priority`. `stack_mode`: `DURATION`, `INTENSITY`, `R
 ### Arena
 
 `Arena` lives next to `CombatManager`, owns its own `%StatusContainer` and an `ArenaResource`. On `enter_battle()` it applies `battle_start_effects` to filtered combatants and `permanent_statuses` to itself. The arena's status container intercepts every combatant's damage/cast pipeline.
+
+### EnemyFormation (spawn API)
+
+`EnemyFormation` (`features/combat/formation/enemy_formation.gd`) places enemies according to a `FormationResource`. Runtime spawn API:
+
+```
+populate(new_formation: FormationResource, entries: Array)
+# entry = {"slot_index": int, "enemy_data": EnemyResource}
+```
+
+`populate()` clears existing Enemy children, instances `enemy_slot.tscn` per entry, sets fields, runs `_layout()`. Used at boot from `CombatManager._spawn_initial_encounter` (temporary hardcode; future room generator will replace it). `combat_arena.tscn` is a bare container — no enemies and no `formation` override baked in.
+
+> Don't add enemies via node-overrides from `main.tscn` (`[node parent="CombatArena/EnemyFormation"]`). Godot drops such overrides on re-save when any reference temporarily fails to resolve. Add enemies in the same scene where `EnemyFormation` lives, or via `populate()`.
 
 ---
 
@@ -199,41 +212,69 @@ Most-used:
 | `accessory_slot_equipped/unequipped` | `slot_index[, accessory]`       | Inventory                          |
 | `log_entry`                     | `String`                             | anywhere → CombatLog               |
 
-Reserved/legacy (declared but unused): `spell_selected`, `player_status_changed`, `damage_outgoing/incoming`, `spells_loaded`, `state_changed`, `combat_finished`.
+Reserved/legacy (declared but unused): `spell_selected`, `player_status_changed`, `spells_loaded`, `state_changed`, `combat_finished`.
 
 ---
 
 ## File map
 
 ```
-autoloads/{event_bus, combat_context}.gd
-scripts/
-  combat/{combat_manager, arena, spellbook, status_container, status_effect, inventory, enemy_formation}.gd
-  combat/pipeline/{damage_info, spell_cast_info, status_change_request}.gd
-  entities/{combatant, player, enemy}.gd
-  statuses/{burning, shield, collect_glove_mod, spark_glove_mod, heat_touch_helm_mod, max_heat_mod}.gd
-  resources/{spell_resource, enemy_resource, arena_resource, arena_battle_start_entry,
-             bound_item_resource, accessory_resource, formation_resource, formation_slot}.gd
-  resources/effects/{spell_effect_resource, deal_damage_effect, apply_status_effect,
-                     collect_heat_effect, ignite_effect}.gd
-  ui/{hud, spell_panel, spell_button, stat_bar, combat_log, info_panel, arena_icon, log_button,
-      inventory_button, inventory_window, inventory_slot, inventory_item_widget,
-      inventory_backpack_drop}.gd
-data/
-  spells/{spark, collect_heat, heat_touch, shield}.tres
-  enemies/skeleton.tres
-  formations/{front_heavy, back_heavy}.tres
-  items/bound/{glove_collect, glove_spark, helm_heat_touch}.tres
-  items/accessories/amulet_max_heat.tres
-scenes/
-  combat/{combat_arena, combat_manager, arena, enemy_slot, inventory}.tscn
-  entities/player.tscn
-  statuses/{burning, shield, collect_glove_mod, spark_glove_mod, heat_touch_helm_mod, max_heat_mod}.tscn
-  ui/{hud, spell_panel, spell_button, stat_bar, combat_log, info_panel, arena_icon, log_button,
-      inventory_button, inventory_window, inventory_slot, inventory_item_widget}.tscn
+features/
+  core/
+    event_bus.gd, combat_context.gd, combatant.gd
+    pipeline/{damage_info, spell_cast_info, status_change_request}.gd
+
+  combat/
+    combat_manager.{gd,tscn}, combat_arena.tscn
+    arena/{arena.{gd,tscn}, arena_resource.gd, arena_battle_start_entry.gd}
+    formation/
+      enemy_formation.gd, formation_resource.gd, formation_slot.gd
+      front_heavy.tres, back_heavy.tres
+
+  combatants/
+    player/{player.gd, player.tscn}
+    enemy/
+      enemy.gd, enemy_slot.tscn, enemy_resource.gd
+      skeleton/{skeleton.tres, skeleton_warrior.png}
+
+  spells/
+    spell_resource.gd, spellbook.gd
+    effects/{spell_effect_resource, deal_damage_effect, apply_status_effect,
+             collect_heat_effect, burning_effect}.gd
+    spark/{spark.tres, spark.svg, spark_name.svg}
+    collect_heat/{collect_heat.tres, collect_heat.svg, collect_heat_active.svg}
+    heat_touch/{heat_touch.tres, heat_touch.svg, heat_touch_active.svg}
+    shield/{shield.tres, shield.svg, shield_active.svg}
+
+  statuses/
+    status_effect.gd, status_container.gd
+    burning/{burning.gd, burning.tscn,
+             smoldering.svg, kindling.svg, blazing.svg, fading.svg}
+    shield/{shield_status.gd, shield_status.tscn}
+    item_mods/
+      collect_glove_mod/{collect_glove_mod.gd, collect_glove_mod.tscn}
+      spark_glove_mod/{spark_glove_mod.gd, spark_glove_mod.tscn}
+      heat_touch_helm_mod/{heat_touch_helm_mod.gd, heat_touch_helm_mod.tscn}
+      max_heat_mod/{max_heat_mod.gd, max_heat_mod.tscn}
+
+  inventory/
+    inventory.{gd,tscn}, bound_item_resource.gd, accessory_resource.gd
+    bound/
+      glove_collect/glove_collect.tres
+      glove_spark/glove_spark.tres
+      helm_heat_touch/helm_heat_touch.tres
+    accessories/
+      amulet_max_heat/amulet_max_heat.tres
+    ui/
+      {inventory_button, inventory_window, inventory_slot,
+       inventory_item_widget, inventory_backpack_drop}.{gd,tscn}
+
+  ui/
+    {hud, spell_panel, spell_button, stat_bar,
+     info_panel, arena_icon, combat_log, log_button}/{<name>.gd, <name>.tscn}
 ```
 
-`scripts/combat/damage_context.gd` is legacy; current pipeline uses `DamageInfo`.
+`main.tscn`, `project.godot`, `icon.svg` live at root. Item icons currently link to their bound spell's icon as a placeholder; long-term each item gets its own.
 
 ---
 
@@ -246,6 +287,8 @@ scenes/
 - **Statuses are `Control` scenes** with size — they affect `StatusContainer` (HBox) layout.
 - **Enemy `ClickArea` must not cover `StatusContainer`** — `Button` with `mouse_filter = STOP` swallows status hovers and breaks tooltips. In `enemy_slot.tscn` the click area is anchored under the column (`offset_top = 81`) and `TextureRect.mouse_filter = IGNORE`. If you change column height, sync the offset.
 - **HUD doesn't load spells** — it listens to `spellbook_changed`. New spells go into `Player.basic_spells`, the spellbook, or via Inventory accessory.
+- **Move files with their UID sidecars.** `.gd` always travels with its `.gd.uid`; `.svg`/`.png` with their `.import`. Godot's FileSystem dock does this automatically; manual moves must take the pair. A bare move regenerates the UID and breaks every reference.
+- **Don't add nodes to an instanced sub-scene from the outer scene** (`[node parent="Instance/Child"]`). Godot drops such overrides on re-save when any reference temporarily fails to resolve. Add them in the same scene where the parent lives, or via a runtime spawn API like `EnemyFormation.populate()`.
 - When emitting an EventBus signal, payload type must match the declaration.
 
 ---
