@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="SpellResource" format=3 uid="uid://ckgg0jkppb5k6"]
 
+[ext_resource type="Script" uid="uid://d3gejcska3apb" path="res://features/spells/effects/spell_effect_resource.gd" id="1_2mkt2"]
 [ext_resource type="Script" uid="uid://dfci4odqknqky" path="res://features/spells/spell_resource.gd" id="1_devp1"]
 [ext_resource type="Texture2D" uid="uid://dkp2cl1buhc4r" path="res://features/spells/spark/spark.svg" id="1_id6pj"]
 [ext_resource type="Texture2D" uid="uid://dndmem0vjwy7o" path="res://features/spells/spark/spark_name.svg" id="2_i8hjm"]
@@ -16,4 +17,4 @@ heat_cost = 20
 heat_reward = 20
 icon = ExtResource("1_id6pj")
 icon_active = ExtResource("2_i8hjm")
-effects = [SubResource("Resource_spark_ignite")]
+effects = Array[ExtResource("1_2mkt2")]([SubResource("Resource_spark_ignite")])

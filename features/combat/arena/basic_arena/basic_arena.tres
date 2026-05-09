@@ -1,8 +1,11 @@
 [gd_resource type="Resource" script_class="ArenaResource" format=3 uid="uid://c0bsicar1tres"]
 
 [ext_resource type="Script" uid="uid://b14u2u5bgsnvk" path="res://features/combat/arena/arena_resource.gd" id="1_resource"]
+[ext_resource type="Script" uid="uid://ccghl2y8u6k4f" path="res://features/combat/arena/arena_battle_start_entry.gd" id="2_15kwp"]
+[ext_resource type="Texture2D" uid="uid://dy56nn00naw2b" path="res://features/combat/arena/basic_arena/basic_arena.png" id="2_bg"]
 
 [resource]
 script = ExtResource("1_resource")
 id = &"basic"
 display_name = "Basic Arena"
+background = ExtResource("2_bg")

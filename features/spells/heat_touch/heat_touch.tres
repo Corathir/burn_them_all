@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dfci4odqknqky" path="res://features/spells/spell_resource.gd" id="1_7l6dd"]
 [ext_resource type="Texture2D" uid="uid://d0rf7v02oooqb" path="res://features/spells/heat_touch/heat_touch.svg" id="1_ky85j"]
+[ext_resource type="Script" uid="uid://d3gejcska3apb" path="res://features/spells/effects/spell_effect_resource.gd" id="1_ymy7b"]
 [ext_resource type="Texture2D" uid="uid://dshw5ejpb0csr" path="res://features/spells/heat_touch/heat_touch_active.svg" id="2_ymy7b"]
 [ext_resource type="Script" uid="uid://dxggk14hvjl2n" path="res://features/spells/effects/deal_damage_effect.gd" id="3_deal_damage"]
 
@@ -16,4 +17,4 @@ spell_name = "Heat Touch"
 heat_cost = 10
 icon = ExtResource("1_ky85j")
 icon_active = ExtResource("2_ymy7b")
-effects = [SubResource("Resource_heat_touch_damage")]
+effects = Array[ExtResource("1_ymy7b")]([SubResource("Resource_heat_touch_damage")])

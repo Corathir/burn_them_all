@@ -7,11 +7,14 @@ class_name Room
 @export var enemies: Array[RoomEnemyEntry] = []
 
 @onready var enemy_formation: EnemyFormation = $EnemyFormation
+@onready var background: TextureRect = $Background
 
 func _ready() -> void:
     var arena: Arena = CombatContext.arena as Arena
     if arena and arena_def:
         arena.def = arena_def
+    if arena_def:
+        background.texture = arena_def.background
     var entries: Array = []
     for entry in enemies:
         if entry == null or entry.enemy_data == null:

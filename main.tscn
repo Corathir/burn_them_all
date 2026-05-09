@@ -1,16 +1,17 @@
 [gd_scene format=3 uid="uid://3pimjqwsjuxp"]
 
 [ext_resource type="PackedScene" uid="uid://bpjtlnxsltrsr" path="res://features/combat/combat_manager.tscn" id="1_ig7tw"]
-[ext_resource type="PackedScene" path="res://features/combat/room/room.tscn" id="2_room"]
+[ext_resource type="PackedScene" uid="uid://b5r0omr0omsc1" path="res://features/combat/room/room.tscn" id="2_room"]
 [ext_resource type="PackedScene" uid="uid://bnecbk17wmvo4" path="res://features/ui/hud/hud.tscn" id="4_7mycd"]
 [ext_resource type="PackedScene" uid="uid://dm0yxf8lvb5kv" path="res://features/ui/combat_log/combat_log.tscn" id="5_combat_log"]
 [ext_resource type="PackedScene" uid="uid://cp1ay3rsc3n0" path="res://features/combatants/player/player.tscn" id="6_player"]
 [ext_resource type="PackedScene" uid="uid://b4r3n41c0n1d" path="res://features/ui/arena_icon/arena_icon.tscn" id="7_arena_icon"]
 [ext_resource type="PackedScene" uid="uid://b1log8t0n1d77" path="res://features/ui/log_button/log_button.tscn" id="8_log_button"]
+[ext_resource type="Resource" uid="uid://ca2pux08b1xd0" path="res://features/combatants/enemy/flamethrower/flamethrower.tres" id="8_vivmo"]
 [ext_resource type="PackedScene" uid="uid://0utxi1yxm7wb" path="res://features/ui/info_panel/info_panel.tscn" id="9_info_panel"]
 [ext_resource type="PackedScene" uid="uid://b1invwindow1" path="res://features/inventory/ui/inventory_window.tscn" id="11_inv_window"]
 [ext_resource type="PackedScene" uid="uid://b1invbtn001" path="res://features/inventory/ui/inventory_button.tscn" id="12_inv_btn"]
-[ext_resource type="Resource" path="res://features/combat/arena/basic_arena.tres" id="13_arena_def"]
+[ext_resource type="Resource" uid="uid://c0bsicar1tres" path="res://features/combat/arena/basic_arena/basic_arena.tres" id="13_arena_def"]
 [ext_resource type="Resource" uid="uid://bwbvdta3hbta3" path="res://features/combat/formation/back_heavy.tres" id="14_formation"]
 [ext_resource type="Script" uid="uid://bti5bq0nhw401" path="res://features/combat/room/room_enemy_entry.gd" id="15_entry"]
 [ext_resource type="Resource" uid="uid://bronnjjg6i4q4" path="res://features/combatants/enemy/skeleton/skeleton.tres" id="16_skeleton"]
@@ -25,6 +26,12 @@ script = ExtResource("15_entry")
 slot_index = 4
 enemy_data = ExtResource("16_skeleton")
 
+[sub_resource type="Resource" id="Resource_2cqfq"]
+script = ExtResource("15_entry")
+slot_index = 1
+enemy_data = ExtResource("8_vivmo")
+metadata/_custom_type_script = "uid://bti5bq0nhw401"
+
 [node name="Main" type="Node3D" unique_id=234299143]
 
 [node name="CombatManager" parent="." unique_id=554111150 instance=ExtResource("1_ig7tw")]
@@ -36,7 +43,7 @@ anchors_preset = 0
 [node name="Room" parent="." unique_id=220179087 instance=ExtResource("2_room")]
 arena_def = ExtResource("13_arena_def")
 formation = ExtResource("14_formation")
-enemies = Array[ExtResource("15_entry")]([SubResource("Resource_entry_3"), SubResource("Resource_entry_4")])
+enemies = Array[ExtResource("15_entry")]([SubResource("Resource_entry_3"), SubResource("Resource_entry_4"), SubResource("Resource_2cqfq")])
 
 [node name="Hud" parent="." unique_id=163915220 instance=ExtResource("4_7mycd")]
 offset_left = 2.0
