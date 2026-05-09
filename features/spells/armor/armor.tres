@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="SpellResource" format=3 uid="uid://c2055lo31d2p5"]
+
+[ext_resource type="Script" uid="uid://dfci4odqknqky" path="res://features/spells/spell_resource.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://d3gejcska3apb" path="res://features/spells/effects/spell_effect_resource.gd" id="1_t3m44"]
+[ext_resource type="Texture2D" uid="uid://cce3dr6icqp8i" path="res://features/spells/armor/armor.svg" id="2_icon"]
+[ext_resource type="Texture2D" uid="uid://dv1icdq81akur" path="res://features/spells/armor/armor_active.svg" id="3_icon_active"]
+[ext_resource type="PackedScene" path="res://features/statuses/armor/armor_status.tscn" id="4_status"]
+[ext_resource type="Script" uid="uid://cqrjglgxqhps7" path="res://features/spells/effects/apply_status_effect.gd" id="5_apply_status"]
+
+[sub_resource type="Resource" id="Resource_armor_effect"]
+script = ExtResource("5_apply_status")
+status_scene = ExtResource("4_status")
+apply_to_self = true
+
+[resource]
+script = ExtResource("1_script")
+id = &"armor"
+spell_name = "Armor"
+heat_cost = 15
+description = "Absorbs all incoming damage and converts it to Heat 1:1 until the start of your next turn."
+target_type = 3
+icon = ExtResource("2_icon")
+icon_active = ExtResource("3_icon_active")
+effects = Array[ExtResource("1_t3m44")]([SubResource("Resource_armor_effect")])

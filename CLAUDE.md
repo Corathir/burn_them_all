@@ -97,19 +97,20 @@ Add new behavior by writing a new `SpellEffectResource` subclass — **do not** 
 - `modify_pre_cast(info)` / `modify_pre_cast_incoming(info)` / `modify_post_cast(info)` — can cancel a cast
 - `intercept_status_change(req)` — can cancel apply/remove/stack changes
 
-Statuses run in descending `priority`. `stack_mode`: `DURATION`, `INTENSITY`, `REFRESH`, `UNIQUE`.
+Statuses run in descending `priority`. `stack_mode`: `DURATION`, `INTENSITY`, `REFRESH`, `UNIQUE`. `negative: bool` marks debuffs — `StatusContainer.apply()` copies it from the probe into `StatusChangeRequest.negative` so interceptors (e.g. `ShieldStatus`) can react.
 
 **Existing statuses:**
 
-- `BurningStatus` — 4-stage burn cycle (see Mechanics).
-- `ShieldStatus` — absorbs next attack, consumes a stack.
+- `BurningStatus` — 4-stage burn cycle (see Mechanics). `negative = true`.
+- `ShieldStatus` — cancels the next negative status applied to host, consumes a stack. Uses `intercept_status_change`.
+- `ArmorStatus` — `modify_incoming_damage`: absorbs damage and grants the player Heat 1:1. Auto-removes on host's `on_turn_start`.
 - `CollectGloveMod` / `SparkGloveMod` / `HeatTouchHelmMod` / `MaxHeatMod` — invisible item-modifier statuses, live under `features/statuses/item_mods/` (see Inventory).
 
 ### Pipeline objects (RefCounted)
 
 - `DamageInfo` — `amount, type, source, target, ability_id, canceled`. Type: `ATTACK | SPELL | BURNING | OVERFLOW | PURE`.
 - `SpellCastInfo` — `spell, caster, target, effects, canceled, extra_data`.
-- `StatusChangeRequest` — `kind (APPLY/REMOVE/MODIFY_STACKS), host, status_id, status_scene, stacks, canceled`.
+- `StatusChangeRequest` — `kind (APPLY/REMOVE/MODIFY_STACKS), host, status_id, status_scene, stacks, negative, canceled`.
 
 ### Arena
 
@@ -256,12 +257,14 @@ features/
     collect_heat/{collect_heat.tres, collect_heat.svg, collect_heat_active.svg}
     heat_touch/{heat_touch.tres, heat_touch.svg, heat_touch_active.svg}
     shield/{shield.tres, shield.svg, shield_active.svg}
+    armor/{armor.tres, armor.svg, armor_active.svg}
 
   statuses/
     status_effect.gd, status_container.gd
     burning/{burning.gd, burning.tscn,
              smoldering.svg, kindling.svg, blazing.svg, fading.svg}
     shield/{shield_status.gd, shield_status.tscn}
+    armor/{armor_status.gd, armor_status.tscn}
     item_mods/
       collect_glove_mod/{collect_glove_mod.gd, collect_glove_mod.tscn}
       spark_glove_mod/{spark_glove_mod.gd, spark_glove_mod.tscn}

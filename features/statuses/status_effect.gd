@@ -8,6 +8,7 @@ enum StackMode { DURATION, INTENSITY, REFRESH, UNIQUE }
 @export var display_name: String
 @export var stack_mode: StackMode = StackMode.INTENSITY
 @export var priority: int = 0
+@export var negative: bool = false
 
 var stacks: int = 1
 var host: Node

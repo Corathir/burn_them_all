@@ -27,6 +27,7 @@ func apply(scene: PackedScene, stacks: int = 1) -> StatusEffect:
     req.status_id = status_id
     req.status_scene = scene
     req.stacks = stacks
+    req.negative = probe.negative
     req.kind = StatusChangeRequest.Kind.APPLY if existing == null else StatusChangeRequest.Kind.MODIFY_STACKS
     process_status_change(req)
     if CombatContext and CombatContext.arena:

@@ -35,6 +35,7 @@ func _init() -> void:
     id = &"burning"
     display_name = "Burning"
     stack_mode = StackMode.UNIQUE
+    negative = true
 
 func on_apply() -> void:
     stored_reward = stacks

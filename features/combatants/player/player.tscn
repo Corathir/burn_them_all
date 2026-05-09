@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cp1ay3rsc3n0"]
+[gd_scene load_steps=14 format=3 uid="uid://cp1ay3rsc3n0"]
 
 [ext_resource type="Script" path="res://features/combatants/player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://features/statuses/status_container.gd" id="2_status_container"]
@@ -8,6 +8,7 @@
 [ext_resource type="Resource" uid="uid://cv6cxhqgnku1i" path="res://features/spells/heat_touch/heat_touch.tres" id="6_heat_touch"]
 [ext_resource type="Resource" uid="uid://xeotkwgeowlu" path="res://features/spells/collect_heat/collect_heat.tres" id="7_collect_heat"]
 [ext_resource type="Resource" uid="uid://dn7r5xkmqp2wb" path="res://features/spells/shield/shield.tres" id="8_shield"]
+[ext_resource type="Resource" uid="uid://b4rm0rsplrs01" path="res://features/spells/armor/armor.tres" id="13_armor"]
 [ext_resource type="Resource" uid="uid://b1bndglovcoll" path="res://features/inventory/bound/glove_collect/glove_collect.tres" id="9_glove_collect"]
 [ext_resource type="Resource" uid="uid://b1bndglovsprk" path="res://features/inventory/bound/glove_spark/glove_spark.tres" id="10_glove_spark"]
 [ext_resource type="Resource" uid="uid://b1bndhelmht" path="res://features/inventory/bound/helm_heat_touch/helm_heat_touch.tres" id="11_helm_heat_touch"]
@@ -19,7 +20,7 @@ max_hp = 100
 display_name = "Player"
 max_heat = 200
 initial_heat = 50
-basic_spells = Array[Resource]([ExtResource("5_spark"), ExtResource("6_heat_touch"), ExtResource("7_collect_heat"), ExtResource("8_shield")])
+basic_spells = Array[Resource]([ExtResource("5_spark"), ExtResource("6_heat_touch"), ExtResource("7_collect_heat"), ExtResource("8_shield"), ExtResource("13_armor")])
 
 [node name="StatusContainer" type="HBoxContainer" parent="."]
 unique_name_in_owner = true

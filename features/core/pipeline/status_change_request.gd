@@ -9,4 +9,5 @@ var host: Combatant
 var status_id: StringName
 var status_scene: PackedScene
 var stacks: int = 1
+var negative: bool = false
 var canceled: bool = false

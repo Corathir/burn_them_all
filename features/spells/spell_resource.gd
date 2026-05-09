@@ -11,8 +11,7 @@ class_name SpellResource
 @export var target_type: TargetType
 @export var icon: Texture2D
 @export var icon_active: Texture2D
-@export var applies_status: PackedScene
-@export var effects: Array = []
+@export var effects: Array[SpellEffectResource] = []
 
 enum TargetType {
     SINGLE_ENEMY,
@@ -68,5 +67,5 @@ func _sum_damage(effect_list: Array) -> int:
 func _format_with_delta(base: int, delta: int) -> String:
     if delta == 0:
         return str(base)
-    var sign: String = "+" if delta > 0 else ""
-    return str(base) + " (" + sign + str(delta) + ")"
+    var result_sign: String = "+" if delta > 0 else ""
+    return str(base) + " (" + result_sign + str(delta) + ")"
