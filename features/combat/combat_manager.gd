@@ -2,9 +2,6 @@ extends Node
 
 class_name CombatManager
 
-const SKELETON: EnemyResource = preload("res://features/combatants/enemy/skeleton/skeleton.tres")
-const BACK_HEAVY: FormationResource = preload("res://features/combat/formation/back_heavy.tres")
-
 @onready var arena: Arena = $Arena
 
 var selected_spell: SpellResource
@@ -16,20 +13,10 @@ func _ready() -> void:
     _start_combat.call_deferred()
 
 func _start_combat() -> void:
-    _spawn_initial_encounter()
     if arena:
         arena.enter_battle()
     if CombatContext.player:
         EventBus.turn_started.emit(CombatContext.player)
-
-func _spawn_initial_encounter() -> void:
-    var formation_node: EnemyFormation = get_node_or_null("../CombatArena/EnemyFormation") as EnemyFormation
-    if formation_node == null:
-        return
-    formation_node.populate(BACK_HEAVY, [
-        {"slot_index": 3, "enemy_data": SKELETON},
-        {"slot_index": 4, "enemy_data": SKELETON},
-    ])
 
 func _on_spell_cast(spell: SpellResource) -> void:
     selected_spell = null

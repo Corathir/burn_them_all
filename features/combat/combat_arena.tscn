@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://gg3qnle0cdq4"]
+[gd_scene format=3 uid="uid://cub15v56gl2xb"]
 
 [ext_resource type="Script" uid="uid://cbj2a5jhr0ua0" path="res://features/combat/formation/enemy_formation.gd" id="1_formation"]
 

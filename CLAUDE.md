@@ -124,9 +124,19 @@ populate(new_formation: FormationResource, entries: Array)
 # entry = {"slot_index": int, "enemy_data": EnemyResource}
 ```
 
-`populate()` clears existing Enemy children, instances `enemy_slot.tscn` per entry, sets fields, runs `_layout()`. Used at boot from `CombatManager._spawn_initial_encounter` (temporary hardcode; future room generator will replace it). `combat_arena.tscn` is a bare container — no enemies and no `formation` override baked in.
+`populate()` clears existing Enemy children, instances `enemy_slot.tscn` per entry, sets fields, runs `_layout()`. Called at boot from `Room._ready` using the Room's exported `enemies` array.
 
-> Don't add enemies via node-overrides from `main.tscn` (`[node parent="CombatArena/EnemyFormation"]`). Godot drops such overrides on re-save when any reference temporarily fails to resolve. Add enemies in the same scene where `EnemyFormation` lives, or via `populate()`.
+### Room (encounter scene)
+
+`Room` (`features/combat/room/room.{gd,tscn}`) is the encounter container instanced in `main.tscn`. It exports:
+
+- `arena_def: ArenaResource` — assigned to `CombatContext.arena.def` on `_ready`.
+- `formation: FormationResource` — passed to its `EnemyFormation` child.
+- `enemies: Array[RoomEnemyEntry]` — each entry has `slot_index` and `enemy_data`.
+
+A future room generator builds Rooms by setting these three fields. `CombatManager._start_combat` runs deferred, so by then Room has populated the formation and assigned the arena def.
+
+> Don't add enemies via node-overrides from `main.tscn` (`[node parent="Room/EnemyFormation"]`). Godot drops such overrides on re-save when any reference temporarily fails to resolve. Add enemies in the same scene where `EnemyFormation` lives, or via `populate()`.
 
 ---
 
@@ -225,11 +235,12 @@ features/
     pipeline/{damage_info, spell_cast_info, status_change_request}.gd
 
   combat/
-    combat_manager.{gd,tscn}, combat_arena.tscn
-    arena/{arena.{gd,tscn}, arena_resource.gd, arena_battle_start_entry.gd}
+    combat_manager.{gd,tscn}
+    arena/{arena.{gd,tscn}, arena_resource.gd, arena_battle_start_entry.gd, basic_arena.tres}
     formation/
       enemy_formation.gd, formation_resource.gd, formation_slot.gd
       front_heavy.tres, back_heavy.tres
+    room/{room.{gd,tscn}, room_enemy_entry.gd}
 
   combatants/
     player/{player.gd, player.tscn}
