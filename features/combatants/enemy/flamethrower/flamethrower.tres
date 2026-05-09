@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EnemyResource" format=3 uid="uid://ca2pux08b1xd0"]
+
+[ext_resource type="Script" uid="uid://doxsec0f682yl" path="res://features/combatants/enemy/enemy_resource.gd" id="1_hmop6"]
+[ext_resource type="Script" uid="uid://dfci4odqknqky" path="res://features/spells/spell_resource.gd" id="2_62es5"]
+[ext_resource type="Texture2D" uid="uid://daromg4qlwwsd" path="res://features/combatants/enemy/flamethrower/flamethrower.png" id="3_o1x80"]
+
+[resource]
+script = ExtResource("1_hmop6")
+enemy_name = "Flamethrower"
+max_hp = 80
+base_damage = 5
+sprite = ExtResource("3_o1x80")
