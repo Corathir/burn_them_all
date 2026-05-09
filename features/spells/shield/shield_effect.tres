@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ApplyStatusEffect" format=3 uid="uid://b5h1eldef0r1"]
+
+[ext_resource type="Script" uid="uid://cqrjglgxqhps7" path="res://features/spells/effects/apply_status_effect.gd" id="1_apply_status"]
+[ext_resource type="PackedScene" uid="uid://csh1eldnewfm0" path="res://features/statuses/shield/shield_status.tscn" id="2_status"]
+
+[resource]
+script = ExtResource("1_apply_status")
+status_scene = ExtResource("2_status")
+apply_to_self = true
