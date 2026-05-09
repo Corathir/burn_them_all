@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://3pimjqwsjuxp"]
 
 [ext_resource type="PackedScene" uid="uid://bpjtlnxsltrsr" path="res://features/combat/combat_manager.tscn" id="1_ig7tw"]
-[ext_resource type="PackedScene" uid="uid://b5r0omr0omsc1" path="res://features/combat/room/room.tscn" id="2_room"]
+[ext_resource type="PackedScene" path="res://features/combat/room/room.tscn" id="2_room"]
 [ext_resource type="PackedScene" uid="uid://bnecbk17wmvo4" path="res://features/ui/hud/hud.tscn" id="4_7mycd"]
 [ext_resource type="PackedScene" uid="uid://dm0yxf8lvb5kv" path="res://features/ui/combat_log/combat_log.tscn" id="5_combat_log"]
 [ext_resource type="PackedScene" uid="uid://cp1ay3rsc3n0" path="res://features/combatants/player/player.tscn" id="6_player"]
@@ -10,9 +10,9 @@
 [ext_resource type="PackedScene" uid="uid://0utxi1yxm7wb" path="res://features/ui/info_panel/info_panel.tscn" id="9_info_panel"]
 [ext_resource type="PackedScene" uid="uid://b1invwindow1" path="res://features/inventory/ui/inventory_window.tscn" id="11_inv_window"]
 [ext_resource type="PackedScene" uid="uid://b1invbtn001" path="res://features/inventory/ui/inventory_button.tscn" id="12_inv_btn"]
-[ext_resource type="Resource" uid="uid://c0bsicar1tres" path="res://features/combat/arena/basic_arena.tres" id="13_arena_def"]
+[ext_resource type="Resource" path="res://features/combat/arena/basic_arena.tres" id="13_arena_def"]
 [ext_resource type="Resource" uid="uid://bwbvdta3hbta3" path="res://features/combat/formation/back_heavy.tres" id="14_formation"]
-[ext_resource type="Script" path="res://features/combat/room/room_enemy_entry.gd" id="15_entry"]
+[ext_resource type="Script" uid="uid://bti5bq0nhw401" path="res://features/combat/room/room_enemy_entry.gd" id="15_entry"]
 [ext_resource type="Resource" uid="uid://bronnjjg6i4q4" path="res://features/combatants/enemy/skeleton/skeleton.tres" id="16_skeleton"]
 
 [sub_resource type="Resource" id="Resource_entry_3"]

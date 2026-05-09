@@ -2,9 +2,11 @@
 
 [ext_resource type="Script" uid="uid://doxsec0f682yl" path="res://features/combatants/enemy/enemy_resource.gd" id="1_k7ddm"]
 [ext_resource type="Script" uid="uid://dfci4odqknqky" path="res://features/spells/spell_resource.gd" id="2_6b0j5"]
+[ext_resource type="Texture2D" uid="uid://0mbe50qgr3u" path="res://features/combatants/enemy/skeleton/skeleton_warrior.png" id="2_sprite"]
 
 [resource]
 script = ExtResource("1_k7ddm")
 enemy_name = "Skeleton"
 max_hp = 40
 base_damage = 8
+sprite = ExtResource("2_sprite")

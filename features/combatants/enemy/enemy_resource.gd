@@ -7,5 +7,6 @@ class_name EnemyResource
 @export var max_hp: int
 @export var base_damage: int
 @export var description: String
+@export var sprite: Texture2D
 @export var spells: Array[SpellResource] = []
 @export var initial_statuses: Array[PackedScene] = []

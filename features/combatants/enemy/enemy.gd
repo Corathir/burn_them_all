@@ -7,6 +7,7 @@ class_name Enemy
 
 @onready var name_label: Label = $Column/NameLabel
 @onready var hp_bar: StatBar = $Column/HpBar
+@onready var sprite: TextureRect = $TextureRect
 @onready var click_area: Button = $ClickArea
 
 func _ready() -> void:
@@ -29,6 +30,7 @@ func init(data: EnemyResource) -> void:
     max_hp = data.max_hp
     hp = data.max_hp
     hp_bar.init(data.max_hp, hp)
+    sprite.texture = data.sprite
     for spell in data.spells:
         spellbook.add_spell(spell)
     for status_scene in data.initial_statuses:
