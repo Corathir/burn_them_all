@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://btl1j5jcqo5u3"]
+[gd_scene load_steps=5 format=3 uid="uid://btl1j5jcqo5u3"]
 
 [ext_resource type="Script" uid="uid://bx7qr3f6ty7c4" path="res://features/combatants/enemy/enemy.gd" id="1_xo6kn"]
 [ext_resource type="PackedScene" uid="uid://ck7rb5xlreedd" path="res://features/ui/stat_bar/stat_bar.tscn" id="2_yq2om"]
+[ext_resource type="PackedScene" uid="uid://bva0xy03lc5jg" path="res://features/ui/intent/intent_display.tscn" id="3_intent"]
 [ext_resource type="Script" path="res://features/statuses/status_container.gd" id="4_status_container"]
 [ext_resource type="Script" path="res://features/spells/spellbook.gd" id="5_spellbook"]
 
@@ -19,6 +20,10 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 162.0
 grow_horizontal = 2
+
+[node name="IntentDisplay" parent="Column" instance=ExtResource("3_intent")]
+layout_mode = 2
+size_flags_horizontal = 4
 
 [node name="NameLabel" type="Label" parent="Column"]
 layout_mode = 2

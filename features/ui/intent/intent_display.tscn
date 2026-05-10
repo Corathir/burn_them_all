@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://bva0xy03lc5jg"]
+
+[ext_resource type="Script" uid="uid://b41gkhtwcgqk2" path="res://features/ui/intent/intent_display.gd" id="1_display"]
+
+[node name="IntentDisplay" type="Control" unique_id=1185085372]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 96.0
+offset_bottom = 56.0
+script = ExtResource("1_display")
+
+[node name="HBox" type="HBoxContainer" parent="." unique_id=358935706]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="Icon" type="TextureRect" parent="HBox" unique_id=827386382]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="HBox" unique_id=353061823]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "0"

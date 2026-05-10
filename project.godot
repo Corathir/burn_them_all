@@ -24,7 +24,6 @@ CombatContext="*res://features/core/combat_context.gd"
 
 window/size/viewport_width=1366
 window/size/viewport_height=768
-window/size/mode=1
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep_width"
 
