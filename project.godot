@@ -20,6 +20,14 @@ config/icon="res://icon.svg"
 EventBus="*uid://dpoe4c5xhhd8p"
 CombatContext="*res://features/core/combat_context.gd"
 
+[display]
+
+window/size/viewport_width=1366
+window/size/viewport_height=768
+window/size/mode=1
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep_width"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/rider-plugin/plugin.cfg")

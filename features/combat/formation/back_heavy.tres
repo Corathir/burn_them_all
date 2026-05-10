@@ -9,21 +9,21 @@ row = 1
 
 [sub_resource type="Resource" id="Resource_slot_1"]
 script = ExtResource("2_slot")
-position = Vector2(154, 0)
+position = Vector2(308, 0)
 row = 1
 
 [sub_resource type="Resource" id="Resource_slot_2"]
 script = ExtResource("2_slot")
-position = Vector2(308, 0)
+position = Vector2(616, 0)
 row = 1
 
 [sub_resource type="Resource" id="Resource_slot_3"]
 script = ExtResource("2_slot")
-position = Vector2(77, 100)
+position = Vector2(154, 200)
 
 [sub_resource type="Resource" id="Resource_slot_4"]
 script = ExtResource("2_slot")
-position = Vector2(231, 100)
+position = Vector2(462, 200)
 
 [resource]
 script = ExtResource("1_resource")
