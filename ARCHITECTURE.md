@@ -492,7 +492,7 @@ func to_info_data(...) -> Dictionary
 
 **Данные:**
 
-- `FormationSlot` — `{position: Vector2, row: int, column: int}`. `row` для z-порядка и для проверки соседей; `column` задаётся явно (не выводится из `position.x`), чтобы ряды со смещёнными x-координатами не ломали соседство.
+- `FormationSlot` — `{position: Vector2, row: int, column: float}`. `row` для z-порядка и для проверки соседей; `column` задаётся явно (не выводится из `position.x`). Ряд с полным числом слотов использует целые колонки (`0, 1, 2, …`); ряд с меньшим числом слотов, вписанный между слотами другого ряда (напр. 2 слота позади ряда из 3), использует полушаги (`0.5, 1.5, …`) — так каждый его слот стоит между двумя слотами соседнего ряда и считается соседним обоим.
 - `FormationResource` — `{id, display_name, slots: Array[FormationSlot]}`.
 
 **Логика** (`features/combat/formation/enemy_formation.gd`, `Control + script`):
@@ -530,7 +530,11 @@ func _layout() -> void
 
 > **Правило:** не добавляй врагов в сцену через node-overrides из `main.tscn` (`[node ... parent="CombatArena/EnemyFormation"]`). Godot выкидывает такие overrides при ре-сейве, если хоть одна ссылка временно невалидна. Враги добавляются либо прямо в той сцене, где `EnemyFormation` живёт, либо через рантайм-`populate`.
 
-**Соседи (neighbors).** `EnemyFormation` регистрирует себя в `CombatContext.formation` в `_ready()` (тот же паттерн, что `Arena`/`Player`). `EnemyFormation.get_neighbors(enemy: Enemy) -> Array[Enemy]` возвращает живых (`hp > 0`) врагов с тем же `row` и `column`, отличающимся ровно на 1. Удобная обёртка — `Enemy.get_neighbors() -> Array[Enemy]`, которую и должны вызывать эффекты/статусы вместо прямого обращения к `CombatContext.formation`. Это инфраструктура под будущие эффекты (сплэш-урон на соседей, распространение статуса и т.п.) — конкретное поведение оформляется отдельным `SpellEffectResource`/хуком `StatusEffect`, без спецкейсов в `CombatManager`.
+**Соседи (neighbors).** `EnemyFormation` регистрирует себя в `CombatContext.formation` в `_ready()` (тот же паттерн, что `Arena`/`Player`). `EnemyFormation.get_neighbors(enemy: Enemy) -> Array[Enemy]` (через `_are_adjacent`) возвращает живых (`hp > 0`) врагов: из того же `row` с `column`, отличающимся ровно на `1`, либо из соседнего ряда (`|row diff| == 1`) с `column`, отличающимся ровно на `0.5`.
+
+Пример на `back_heavy` (3 сзади — колонки 0/1/2, 2 спереди — колонки 0.5/1.5): у переднего слота 0.5 соседи — передний 1.5 (тот же ряд), задний 0 и задний 1 (оба в 0.5) — задний 2 не сосед. У заднего слота 0 соседи — задний 1 (тот же ряд) и передний 0.5 — передний 1.5 не сосед. Для `front_heavy` симметрично (ряды поменяны местами).
+
+Удобная обёртка — `Enemy.get_neighbors() -> Array[Enemy]`, которую и должны вызывать эффекты/статусы вместо прямого обращения к `CombatContext.formation`. Это инфраструктура под будущие эффекты (сплэш-урон на соседей, распространение статуса и т.п.) — конкретное поведение оформляется отдельным `SpellEffectResource`/хуком `StatusEffect`, без спецкейсов в `CombatManager`.
 
 ---
 

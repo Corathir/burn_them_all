@@ -55,7 +55,8 @@ func _slot_row(idx: int) -> int:
         return 0
     return formation.slots[idx].row
 
-## Live (hp > 0) enemies sharing the row and an adjacent column with `enemy`.
+## Live (hp > 0) enemies adjacent to `enemy`: same row with column diff 1,
+## or a neighboring row with column diff 0.5 (see FormationSlot.column).
 func get_neighbors(enemy: Enemy) -> Array[Enemy]:
     var result: Array[Enemy] = []
     var slot: FormationSlot = _slot_for(enemy)
@@ -70,9 +71,18 @@ func get_neighbors(enemy: Enemy) -> Array[Enemy]:
         var other_slot: FormationSlot = _slot_for(other)
         if other_slot == null:
             continue
-        if other_slot.row == slot.row and absi(other_slot.column - slot.column) == 1:
+        if _are_adjacent(slot, other_slot):
             result.append(other)
     return result
+
+func _are_adjacent(a: FormationSlot, b: FormationSlot) -> bool:
+    var row_diff: int = absi(a.row - b.row)
+    var column_diff: float = absf(a.column - b.column)
+    if row_diff == 0:
+        return is_equal_approx(column_diff, 1.0)
+    if row_diff == 1:
+        return is_equal_approx(column_diff, 0.5)
+    return false
 
 func _slot_for(enemy: Enemy) -> FormationSlot:
     if formation == null:

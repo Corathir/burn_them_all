@@ -22,13 +22,13 @@ column = 2
 script = ExtResource("2_slot")
 position = Vector2(154, 0)
 row = 1
-column = 0
+column = 0.5
 
 [sub_resource type="Resource" id="Resource_slot_4"]
 script = ExtResource("2_slot")
 position = Vector2(462, 0)
 row = 1
-column = 1
+column = 1.5
 
 [resource]
 script = ExtResource("1_resource")
