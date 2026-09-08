@@ -6,11 +6,7 @@ func execute(info: SpellCastInfo) -> void:
     if not can_target(info.caster, info.target):
         return
     var burning: BurningStatus = info.target.statuses.find(&"burning") as BurningStatus
-    var heat: int = burning.calculate_collect_value()
-    if info.caster.has_method("gain_heat"):
-        info.caster.gain_heat(heat)
-    info.target.statuses.remove(&"burning")
-    EventBus.log_entry.emit(info.spell.spell_name + " → " + info.target.display_name + " (+" + str(heat) + " Heat)")
+    burning.resolve_collect(info.caster, info.target)
 
 func can_target(_caster: Combatant, target: Combatant) -> bool:
     if target == null:

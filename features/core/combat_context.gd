@@ -5,6 +5,7 @@ var enemies: Array[Combatant] = []
 var arena: Node
 var info_panel: InfoPanel
 var selected_spell: SpellResource
+var formation: Node
 
 func all_combatants() -> Array[Combatant]:
     var result: Array[Combatant] = []
@@ -20,3 +21,4 @@ func reset() -> void:
     arena = null
     info_panel = null
     selected_spell = null
+    formation = null

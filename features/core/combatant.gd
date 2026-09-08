@@ -88,7 +88,12 @@ func cast(spell: SpellResource, target: Combatant) -> bool:
     return true
 
 func apply_raw_damage(amount: int) -> void:
+    var was_alive: bool = hp > 0
     hp = max(0, hp - amount)
+    if was_alive and hp <= 0:
+        for s in statuses.get_children().duplicate():
+            if s is StatusEffect:
+                (s as StatusEffect).on_death()
 
 func _try_pay_cost(_info: SpellCastInfo) -> bool:
     return true

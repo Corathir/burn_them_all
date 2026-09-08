@@ -68,6 +68,9 @@ func apply_raw_damage(amount: int) -> void:
 func take_turn(target: Combatant) -> void:
     if target == null or hp <= 0:
         return
+    if _consume_stun():
+        plan_next_action()
+        return
     if spellbook.spells.is_empty():
         var dmg: int = enemy_data.base_damage if enemy_data else 0
         if dmg > 0:
@@ -80,6 +83,14 @@ func take_turn(target: Combatant) -> void:
         var spell: SpellResource = spellbook.spells[0]
         cast(spell, target)
     plan_next_action()
+
+func _consume_stun() -> bool:
+    for s in statuses.get_children():
+        if s is StatusEffect and (s as StatusEffect).blocks_turn():
+            EventBus.log_entry.emit(display_name + " is stunned and skips its turn")
+            statuses.remove((s as StatusEffect).id)
+            return true
+    return false
 
 func plan_next_action() -> void:
     next_intent = _build_intent()
@@ -162,6 +173,13 @@ func _is_valid_target(spell: SpellResource) -> bool:
         if not effect.can_target(CombatContext.player, self):
             return false
     return true
+
+## Live enemies adjacent to this one in the current formation (same row, next column).
+func get_neighbors() -> Array[Enemy]:
+    var formation: EnemyFormation = CombatContext.formation as EnemyFormation
+    if formation == null:
+        return [] as Array[Enemy]
+    return formation.get_neighbors(self)
 
 func _on_hover_enter() -> void:
     statuses.notify_hover_enter(CombatContext.player, CombatContext.selected_spell)

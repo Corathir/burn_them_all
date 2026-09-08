@@ -7,6 +7,7 @@ const ENEMY_SLOT_SCENE: PackedScene = preload("res://features/combatants/enemy/e
 @export var formation: FormationResource
 
 func _ready() -> void:
+    CombatContext.formation = self
     _layout()
 
 func populate(new_formation: FormationResource, entries: Array) -> void:
@@ -53,3 +54,30 @@ func _slot_row(idx: int) -> int:
     if idx < 0 or idx >= formation.slots.size():
         return 0
     return formation.slots[idx].row
+
+## Live (hp > 0) enemies sharing the row and an adjacent column with `enemy`.
+func get_neighbors(enemy: Enemy) -> Array[Enemy]:
+    var result: Array[Enemy] = []
+    var slot: FormationSlot = _slot_for(enemy)
+    if slot == null:
+        return result
+    for child in get_children():
+        if not (child is Enemy) or child == enemy or not is_instance_valid(child):
+            continue
+        var other: Enemy = child as Enemy
+        if other.hp <= 0:
+            continue
+        var other_slot: FormationSlot = _slot_for(other)
+        if other_slot == null:
+            continue
+        if other_slot.row == slot.row and absi(other_slot.column - slot.column) == 1:
+            result.append(other)
+    return result
+
+func _slot_for(enemy: Enemy) -> FormationSlot:
+    if formation == null:
+        return null
+    var idx: int = enemy.slot_index
+    if idx < 0 or idx >= formation.slots.size():
+        return null
+    return formation.slots[idx]

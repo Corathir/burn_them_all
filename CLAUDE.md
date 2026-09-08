@@ -96,14 +96,17 @@ Add new behavior by writing a new `SpellEffectResource` subclass — **do not** 
 - `on_damage_dealt(info)` / `on_damage_taken(info)`
 - `modify_pre_cast(info)` / `modify_pre_cast_incoming(info)` / `modify_post_cast(info)` — can cancel a cast
 - `intercept_status_change(req)` — can cancel apply/remove/stack changes
+- `blocks_turn() -> bool` — if true, host skips its next action (see `StunStatus`); the caller removes the status once consumed
+- `on_death()` — fires once when host's hp drops from >0 to <=0 (see `BurningStatus`)
 
 Statuses run in descending `priority`. `stack_mode`: `DURATION`, `INTENSITY`, `REFRESH`, `UNIQUE`. `negative: bool` marks debuffs — `StatusContainer.apply()` copies it from the probe into `StatusChangeRequest.negative` so interceptors (e.g. `ShieldStatus`) can react.
 
 **Existing statuses:**
 
-- `BurningStatus` — 4-stage burn cycle (see Mechanics). `negative = true`.
+- `BurningStatus` — 4-stage burn cycle (see Mechanics). `negative = true`. Owns `resolve_collect(caster, target)`, called by `CollectHeatEffect` — payoff differs per stage. On `on_death()`, splits leftover stored fuel across formation neighbors.
 - `ShieldStatus` — cancels the next negative status applied to host, consumes a stack. Uses `intercept_status_change`.
 - `ArmorStatus` — `modify_incoming_damage`: absorbs damage and grants the player Heat 1:1. Auto-removes on host's `on_turn_start`.
+- `StunStatus` — `blocks_turn() -> true`; consumed and removed by `Enemy.take_turn()`'s `_consume_stun()` before it acts. Applied by `BurningStatus` when Fading expires without being collected.
 - `CollectGloveMod` / `SparkGloveMod` / `HeatTouchHelmMod` / `MaxHeatMod` — invisible item-modifier statuses, live under `features/statuses/item_mods/` (see Inventory).
 
 ### Pipeline objects (RefCounted)
@@ -126,6 +129,10 @@ populate(new_formation: FormationResource, entries: Array)
 ```
 
 `populate()` clears existing Enemy children, instances `enemy_slot.tscn` per entry, sets fields, runs `_layout()`. Called at boot from `Room._ready` using the Room's exported `enemies` array.
+
+`EnemyFormation` registers itself on `CombatContext.formation` in `_ready()`, same pattern as `Arena`/`Player`.
+
+**Neighbors:** `FormationSlot` has `row` and `column` (column is authored explicitly, not derived from `position.x`, so rows can be offset without breaking adjacency — see `front_heavy.tres`/`back_heavy.tres`). `EnemyFormation.get_neighbors(enemy: Enemy) -> Array[Enemy]` returns live (`hp > 0`) enemies sharing the same `row` with `column` off by exactly 1. Prefer the convenience wrapper `Enemy.get_neighbors() -> Array[Enemy]` from spell effects / statuses rather than reaching into `CombatContext.formation` directly. This is groundwork for effects that should also affect the target's neighbors (e.g. a cleave `DealDamageEffect` variant, or a status that spreads via `on_apply`) — write it as its own `SpellEffectResource`/`StatusEffect` hook, do not special-case neighbors inside `CombatManager`.
 
 ### Room (encounter scene)
 
@@ -190,14 +197,18 @@ Consumers: `SpellButton`, `StatusEffect._on_mouse_entered` (base), `InventorySlo
 Smoldering → Kindling → Blazing → Fading → removed
 ```
 
-Stage transitions in `on_turn_start` (host's turn).
+Stage transitions in `on_turn_start` (host's turn). Burning no longer modifies the host's own outgoing damage at any stage.
 
-| Stage      | ATTACK from host  | CollectHeat coefficient |
-|------------|-------------------|-------------------------|
-| Smoldering | normal            | 0.0                     |
-| Kindling   | × 0.5             | 0.5                     |
-| Blazing    | 0, canceled       | 1.5                     |
-| Fading     | × 0.5             | 1.0                     |
+| Stage      | Collect Heat effect                                                          |
+|------------|-------------------------------------------------------------------------------|
+| Smoldering | blocked — invalid target (`CollectHeatEffect.can_target`)                    |
+| Kindling   | grants `stored_reward × 0.5` Heat **and** deals `stored_reward` PURE damage to the target |
+| Blazing    | grants `stored_reward × 2` Heat, removes Burning                             |
+| Fading     | grants `stored_reward × 1` Heat, removes Burning                             |
+
+While Burning is in Fading (regardless of whether it gets collected or expires on its own), the host takes ×1.5 incoming damage (`modify_incoming_damage`). If Fading expires on its own (not collected first), the host also gets `StunStatus` applied before Burning is removed — `_collected_during_fading` on `BurningStatus` tracks whether Collect Heat already fired during Fading, suppressing the stun.
+
+**On death** (`on_death()`, any stage): if the host still has stored fuel, it's split evenly across the host's live formation neighbors (`Enemy.get_neighbors()`) and applied as Burning/Smoldering fuel on each (`StatusContainer.apply`, so a neighbor already Smoldering just gets fed, per the normal stacking rule above). No neighbors, or nothing stored → no-op.
 
 ---
 
@@ -266,6 +277,7 @@ features/
              smoldering.svg, kindling.svg, blazing.svg, fading.svg}
     shield/{shield_status.gd, shield_status.tscn}
     armor/{armor_status.gd, armor_status.tscn}
+    stun/{stun_status.gd, stun_status.tscn}
     item_mods/
       collect_glove_mod/{collect_glove_mod.gd, collect_glove_mod.tscn}
       spark_glove_mod/{spark_glove_mod.gd, spark_glove_mod.tscn}

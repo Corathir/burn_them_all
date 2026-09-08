@@ -492,7 +492,7 @@ func to_info_data(...) -> Dictionary
 
 **Данные:**
 
-- `FormationSlot` — `{position: Vector2, row: int}`. `row` для логики (AoE по ряду, line-of-sight) и z-порядка.
+- `FormationSlot` — `{position: Vector2, row: int, column: int}`. `row` для z-порядка и для проверки соседей; `column` задаётся явно (не выводится из `position.x`), чтобы ряды со смещёнными x-координатами не ломали соседство.
 - `FormationResource` — `{id, display_name, slots: Array[FormationSlot]}`.
 
 **Логика** (`features/combat/formation/enemy_formation.gd`, `Control + script`):
@@ -529,6 +529,8 @@ func _layout() -> void
 `combat_arena.tscn` — пустой контейнер с `EnemyFormation` без `formation`-оверрайда и без Enemy-детей: всё население сцены приходит через `populate`.
 
 > **Правило:** не добавляй врагов в сцену через node-overrides из `main.tscn` (`[node ... parent="CombatArena/EnemyFormation"]`). Godot выкидывает такие overrides при ре-сейве, если хоть одна ссылка временно невалидна. Враги добавляются либо прямо в той сцене, где `EnemyFormation` живёт, либо через рантайм-`populate`.
+
+**Соседи (neighbors).** `EnemyFormation` регистрирует себя в `CombatContext.formation` в `_ready()` (тот же паттерн, что `Arena`/`Player`). `EnemyFormation.get_neighbors(enemy: Enemy) -> Array[Enemy]` возвращает живых (`hp > 0`) врагов с тем же `row` и `column`, отличающимся ровно на 1. Удобная обёртка — `Enemy.get_neighbors() -> Array[Enemy]`, которую и должны вызывать эффекты/статусы вместо прямого обращения к `CombatContext.formation`. Это инфраструктура под будущие эффекты (сплэш-урон на соседей, распространение статуса и т.п.) — конкретное поведение оформляется отдельным `SpellEffectResource`/хуком `StatusEffect`, без спецкейсов в `CombatManager`.
 
 ---
 

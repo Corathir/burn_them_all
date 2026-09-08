@@ -58,6 +58,15 @@ func on_turn_start() -> void:
 func on_turn_end() -> void:
     pass
 
+## Override to make the host skip its next action (see StunStatus). The
+## caller is responsible for removing the status once it consumes the skip.
+func blocks_turn() -> bool:
+    return false
+
+## Fires once, when the host's hp drops from >0 to <=0 (see BurningStatus).
+func on_death() -> void:
+    pass
+
 func modify_outgoing_damage(_info: DamageInfo) -> void:
     pass
 
