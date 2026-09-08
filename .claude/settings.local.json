@@ -1,11 +1,12 @@
 {
-  "defaultMode": "acceptEdits",
   "permissions": {
     "allow": [
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(xargs -I{} sh -c 'echo \"{}:\"; grep \"uid=\" \"{}\"')",
-      "PowerShell(Get-ChildItem -Path features -Recurse -File | Group-Object -Property { $_.FullName.Substring\\(\\(Get-Location\\).Path.Length + 10\\).Split\\('\\\\'\\)[0] } | Sort-Object Name | ForEach-Object { \"{0,-13} {1,3} files\" -f $_.Name, $_.Count })"
+      "PowerShell(Get-ChildItem -Path features -Recurse -File | Group-Object -Property { $_.FullName.Substring\\(\\(Get-Location\\).Path.Length + 10\\).Split\\('\\\\'\\)[0] } | Sort-Object Name | ForEach-Object { \"{0,-13} {1,3} files\" -f $_.Name, $_.Count })",
+      "PowerShell(New-Item *)"
     ]
-  }
+  },
+  "defaultMode": "acceptEdits"
 }

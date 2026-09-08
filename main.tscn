@@ -15,6 +15,7 @@
 [ext_resource type="Resource" uid="uid://bwbvdta3hbta3" path="res://features/combat/formation/back_heavy.tres" id="14_formation"]
 [ext_resource type="Script" uid="uid://bti5bq0nhw401" path="res://features/combat/room/room_enemy_entry.gd" id="15_entry"]
 [ext_resource type="Resource" uid="uid://bronnjjg6i4q4" path="res://features/combatants/enemy/skeleton/skeleton.tres" id="16_skeleton"]
+[ext_resource type="PackedScene" path="res://features/ui/cursor/cursor.tscn" id="17_cursor"]
 
 [sub_resource type="Resource" id="Resource_entry_3"]
 script = ExtResource("15_entry")
@@ -85,3 +86,7 @@ anchors_preset = 1
 inventory_window_path = NodePath("../InventoryWindow")
 
 [node name="InfoPanel" parent="." unique_id=53311040 instance=ExtResource("9_info_panel")]
+
+[node name="Cursor" parent="." unique_id=1594414314 instance=ExtResource("17_cursor")]
+grow_horizontal = 2
+grow_vertical = 2

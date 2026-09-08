@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b8urn1ngsts02"]
 
-[ext_resource type="Script" path="res://features/statuses/burning/burning.gd" id="1_burning"]
+[ext_resource type="Script" path="res://features/statuses/burning/burning_status.gd" id="1_burning"]
 
 [node name="Burning" type="Control"]
 custom_minimum_size = Vector2(40, 40)

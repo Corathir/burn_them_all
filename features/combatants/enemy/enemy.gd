@@ -148,10 +148,21 @@ func _reset_jerk_tween() -> void:
     _jerk_tween = create_tween()
 
 func _on_click() -> void:
+    var spell: SpellResource = CombatContext.selected_spell
+    if spell != null and not _is_valid_target(spell):
+        return
     EventBus.target_selected.emit(self)
+
+func _is_valid_target(spell: SpellResource) -> bool:
+    for effect in spell.effects:
+        if not effect.can_target(CombatContext.player, self):
+            return false
+    return true
 
 func _on_hover_enter() -> void:
     statuses.notify_hover_enter(CombatContext.player, CombatContext.selected_spell)
+    EventBus.enemy_hover_entered.emit(self)
 
 func _on_hover_exit() -> void:
     statuses.notify_hover_exit()
+    EventBus.enemy_hover_exited.emit(self)

@@ -13,8 +13,11 @@ func _init() -> void:
 func modify_pre_cast(info: SpellCastInfo) -> void:
     if info.spell == null or info.spell.id != &"collect_heat":
         return
-    var had_burning: bool = info.target != null and info.target.statuses != null and info.target.statuses.find(&"burning") != null
-    info.extra_data["collect_glove_active"] = had_burning
+    var burning: BurningStatus = null
+    if info.target != null and info.target.statuses != null:
+        burning = info.target.statuses.find(&"burning") as BurningStatus
+    var can_collect: bool = burning != null and burning.stage != BurningStatus.Stage.SMOLDERING
+    info.extra_data["collect_glove_active"] = can_collect
 
 func modify_post_cast(info: SpellCastInfo) -> void:
     if info.spell == null or info.spell.id != &"collect_heat":

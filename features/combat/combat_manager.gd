@@ -25,6 +25,7 @@ func _on_spell_cast(spell: SpellResource) -> void:
         EventBus.spell_resolved.emit()
         return
     CombatContext.selected_spell = spell
+    EventBus.spell_selected.emit(spell)
 
 func _on_spell_selection_canceled() -> void:
     CombatContext.selected_spell = null

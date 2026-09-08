@@ -222,8 +222,10 @@ Most-used:
 | `bound_slot_equipped/unequipped`| `spell_id[, item]`                   | Inventory                          |
 | `accessory_slot_equipped/unequipped` | `slot_index[, accessory]`       | Inventory                          |
 | `log_entry`                     | `String`                             | anywhere → CombatLog               |
+| `spell_selected`                | `SpellResource`                      | CombatManager → Cursor             |
+| `enemy_hover_entered/exited`    | `Enemy`                              | Enemy.ClickArea → Cursor           |
 
-Reserved/legacy (declared but unused): `spell_selected`, `player_status_changed`, `spells_loaded`, `state_changed`, `combat_finished`.
+Reserved/legacy (declared but unused): `player_status_changed`, `spells_loaded`, `state_changed`, `combat_finished`.
 
 ---
 
@@ -261,7 +263,7 @@ features/
 
   statuses/
     status_effect.gd, status_container.gd
-    burning/{burning.gd, burning.tscn,
+    burning/{burning_status.gd, burning.tscn,
              smoldering.svg, kindling.svg, blazing.svg, fading.svg}
     shield/{shield_status.gd, shield_status.tscn}
     armor/{armor_status.gd, armor_status.tscn}
@@ -286,6 +288,7 @@ features/
   ui/
     {hud, spell_panel, spell_button, stat_bar,
      info_panel, arena_icon, combat_log, log_button}/{<name>.gd, <name>.tscn}
+    cursor/{cursor.gd, cursor.tscn, cursor.svg, cursor_red.svg}
 ```
 
 `main.tscn`, `project.godot`, `icon.svg` live at root. Item icons currently link to their bound spell's icon as a placeholder; long-term each item gets its own.

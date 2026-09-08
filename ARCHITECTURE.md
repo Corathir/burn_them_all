@@ -122,7 +122,7 @@ features/
     status_effect.gd               ← базовый класс
     status_container.gd            ← контейнер статусов на бойце/арене
     burning/
-      burning.gd / burning.tscn
+      burning_status.gd / burning.tscn
       smoldering.svg + kindling.svg + blazing.svg + fading.svg
     shield/
       shield_status.gd / shield_status.tscn
