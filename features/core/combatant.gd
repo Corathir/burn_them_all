@@ -80,6 +80,11 @@ func cast(spell: SpellResource, target: Combatant) -> bool:
     if CombatContext.arena:
         CombatContext.arena.statuses.process_post_cast(info)
     EventBus.spell_cast_resolved.emit(info)
+
+    var other: Combatant = target if target != null else self
+    _on_combat_action(other, true)
+    if target != null and target != self:
+        target._on_combat_action(self, false)
     return true
 
 func apply_raw_damage(amount: int) -> void:
@@ -87,3 +92,7 @@ func apply_raw_damage(amount: int) -> void:
 
 func _try_pay_cost(_info: SpellCastInfo) -> bool:
     return true
+
+## Visual-reaction hook: `other` is self on a self-target cast; `as_actor` is false when receiving.
+func _on_combat_action(_other: Combatant, _as_actor: bool) -> void:
+    pass
