@@ -4,12 +4,11 @@ class_name CombatManager
 
 @onready var arena: Arena = $Arena
 
-var selected_spell: SpellResource
-
 func _ready() -> void:
     EventBus.target_selected.connect(_on_target_selected)
     EventBus.spell_cast.connect(_on_spell_cast)
     EventBus.turn_ended.connect(_end_player_turn)
+    EventBus.spell_selection_canceled.connect(_on_spell_selection_canceled)
     _start_combat.call_deferred()
 
 func _start_combat() -> void:
@@ -19,22 +18,25 @@ func _start_combat() -> void:
         EventBus.turn_started.emit(CombatContext.player)
 
 func _on_spell_cast(spell: SpellResource) -> void:
-    selected_spell = null
+    CombatContext.selected_spell = null
     if spell.target_type == SpellResource.TargetType.SELF:
         if CombatContext.player and CombatContext.player.cast(spell, null):
             EventBus.log_entry.emit(spell.spell_name + " (" + str(-1 * spell.heat_cost) + " Heat)")
         EventBus.spell_resolved.emit()
         return
-    selected_spell = spell
+    CombatContext.selected_spell = spell
+
+func _on_spell_selection_canceled() -> void:
+    CombatContext.selected_spell = null
 
 func _on_target_selected(enemy) -> void:
-    if selected_spell == null:
+    if CombatContext.selected_spell == null:
         return
     if CombatContext.player == null:
         return
-    var spell: SpellResource = selected_spell
+    var spell: SpellResource = CombatContext.selected_spell
     var ok: bool = CombatContext.player.cast(spell, enemy)
-    selected_spell = null
+    CombatContext.selected_spell = null
     EventBus.spell_resolved.emit()
     if not ok:
         return

@@ -13,6 +13,8 @@ enum StackMode { DURATION, INTENSITY, REFRESH, UNIQUE }
 var stacks: int = 1
 var host: Node
 
+var _hover_highlighted: bool = false
+
 func _ready() -> void:
     for child in get_children():
         if child is Control:
@@ -79,3 +81,26 @@ func modify_post_cast(_info: SpellCastInfo) -> void:
 
 func intercept_status_change(_req: StatusChangeRequest) -> void:
     pass
+
+## Called when the cursor enters the host's hover area (e.g. the enemy's
+## click region). `spell` is whatever spell is currently pending a target
+## (null if none). Override `_reacts_to_hover` to opt into the default
+## highlight, or override this directly for a custom preview (see BurningStatus).
+func on_hover_enter(caster: Combatant, spell: SpellResource) -> void:
+    if _reacts_to_hover(caster, spell):
+        _set_highlighted(true)
+
+func on_hover_exit() -> void:
+    _set_highlighted(false)
+
+## Override to opt into the generic hover highlight (see ArmorStatus).
+func _reacts_to_hover(_caster: Combatant, _spell: SpellResource) -> bool:
+    return false
+
+func _set_highlighted(value: bool) -> void:
+    if _hover_highlighted == value:
+        return
+    _hover_highlighted = value
+    pivot_offset = size / 2.0
+    scale = Vector2.ONE * 1.25 if value else Vector2.ONE
+    modulate = Color(1.35, 1.25, 0.85) if value else Color.WHITE

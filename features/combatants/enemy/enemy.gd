@@ -24,6 +24,8 @@ func _ready() -> void:
         init(enemy_data)
     click_area.flat = true
     click_area.pressed.connect(_on_click)
+    click_area.mouse_entered.connect(_on_hover_enter)
+    click_area.mouse_exited.connect(_on_hover_exit)
     tree_exiting.connect(_on_tree_exiting)
     plan_next_action()
 
@@ -96,3 +98,9 @@ func _sum_damage(effect_list: Array) -> int:
 
 func _on_click() -> void:
     EventBus.target_selected.emit(self)
+
+func _on_hover_enter() -> void:
+    statuses.notify_hover_enter(CombatContext.player, CombatContext.selected_spell)
+
+func _on_hover_exit() -> void:
+    statuses.notify_hover_exit()

@@ -38,6 +38,7 @@ func _on_spell_click(spell: SpellResource):
 
     if clicked_button == selected_button:
         deselect()
+        EventBus.spell_selection_canceled.emit()
         return
 
     if selected_button:

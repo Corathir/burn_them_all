@@ -123,6 +123,14 @@ func process_post_cast(info: SpellCastInfo) -> void:
     for s in _sorted():
         s.modify_post_cast(info)
 
+func notify_hover_enter(caster: Combatant, spell: SpellResource) -> void:
+    for s in _sorted():
+        s.on_hover_enter(caster, spell)
+
+func notify_hover_exit() -> void:
+    for s in _sorted():
+        s.on_hover_exit()
+
 func process_status_change(req: StatusChangeRequest) -> void:
     for s in _sorted():
         s.intercept_status_change(req)

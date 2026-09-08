@@ -26,6 +26,14 @@ func modify_incoming_damage(info: DamageInfo) -> void:
 func on_turn_start() -> void:
     (host as Combatant).statuses.remove(id)
 
+func _reacts_to_hover(_caster: Combatant, spell: SpellResource) -> bool:
+    if spell == null:
+        return false
+    for effect in spell.effects:
+        if effect is DealDamageEffect:
+            return true
+    return false
+
 func to_info_data() -> Dictionary:
     var data: Dictionary = super.to_info_data()
     if icon and icon.texture:

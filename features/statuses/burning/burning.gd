@@ -27,6 +27,7 @@ const STAGE_NAMES: Dictionary = {
 
 var stage: Stage = Stage.SMOLDERING
 var stored_reward: int = 0
+var _hover_preview: bool = false
 
 @onready var icon: TextureRect = $Icon
 @onready var reward_label: Label = $RewardLabel
@@ -92,9 +93,31 @@ func _set_stage(new_stage: Stage) -> void:
     _update_visual()
     EventBus.log_entry.emit(_host_name() + " is now " + STAGE_NAMES.get(stage, ""))
 
+func on_hover_enter(_caster: Combatant, spell: SpellResource) -> void:
+    if spell == null or not _has_collect_heat_effect(spell):
+        return
+    _hover_preview = true
+    if reward_label:
+        reward_label.text = str(calculate_collect_value())
+    if icon:
+        icon.modulate = Color(1.35, 1.25, 0.85)
+
+func on_hover_exit() -> void:
+    if not _hover_preview:
+        return
+    _hover_preview = false
+    _update_visual()
+
+func _has_collect_heat_effect(spell: SpellResource) -> bool:
+    for effect in spell.effects:
+        if effect is CollectHeatEffect:
+            return true
+    return false
+
 func _update_visual() -> void:
     if icon:
         icon.texture = STAGE_TEXTURES.get(stage, null)
+        icon.modulate = Color.WHITE
     if reward_label:
         reward_label.text = str(stored_reward)
 

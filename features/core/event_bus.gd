@@ -11,6 +11,7 @@ signal combat_finished(result)
 signal log_entry(text)
 signal state_changed(new_state)
 signal spell_resolved()
+signal spell_selection_canceled()
 signal combat_initialized(max_hp: int, hp: int, max_heat: int, heat: int)
 
 signal status_applied(carrier: Node, status: Node)
