@@ -101,8 +101,10 @@ func on_hover_enter(_caster: Combatant, spell: SpellResource) -> void:
         reward_label.text = str(calculate_collect_value())
     if icon:
         icon.modulate = Color(1.35, 1.25, 0.85)
+    _set_highlighted(true)
 
 func on_hover_exit() -> void:
+    _set_highlighted(false)
     if not _hover_preview:
         return
     _hover_preview = false
