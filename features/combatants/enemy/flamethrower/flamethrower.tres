@@ -3,6 +3,9 @@
 [ext_resource type="Script" uid="uid://doxsec0f682yl" path="res://features/combatants/enemy/enemy_resource.gd" id="1_hmop6"]
 [ext_resource type="Script" uid="uid://dfci4odqknqky" path="res://features/spells/spell_resource.gd" id="2_62es5"]
 [ext_resource type="Texture2D" uid="uid://daromg4qlwwsd" path="res://features/combatants/enemy/flamethrower/flamethrower.png" id="3_o1x80"]
+[ext_resource type="PackedScene" path="res://features/combatants/enemy/flamethrower/flamethrower_slot.tscn" id="4_scene"]
+[ext_resource type="Resource" path="res://features/combatants/enemy/flamethrower/flamethrower_attack.tres" id="5_attack"]
+[ext_resource type="Resource" path="res://features/spells/enemy/purify/purify.tres" id="6_purify"]
 
 [resource]
 script = ExtResource("1_hmop6")
@@ -10,3 +13,5 @@ enemy_name = "Flamethrower"
 max_hp = 80
 base_damage = 5
 sprite = ExtResource("3_o1x80")
+spells = Array[ExtResource("2_62es5")]([ExtResource("5_attack"), ExtResource("6_purify")])
+enemy_scene = ExtResource("4_scene")

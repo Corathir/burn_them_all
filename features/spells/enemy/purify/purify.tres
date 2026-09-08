@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellResource" format=3 uid="uid://nfdwolf40usw"]
+
+[ext_resource type="Script" uid="uid://d3gejcska3apb" path="res://features/spells/effects/spell_effect_resource.gd" id="1_base"]
+[ext_resource type="Script" uid="uid://dfci4odqknqky" path="res://features/spells/spell_resource.gd" id="2_spell"]
+[ext_resource type="Texture2D" uid="uid://c1km7ku4pk6tt" path="res://features/spells/enemy/purify/purify.svg" id="3_icon"]
+[ext_resource type="Script" uid="uid://dpntwn8j8a7p6" path="res://features/spells/effects/remove_status_effect.gd" id="4_effect"]
+
+[sub_resource type="Resource" id="Resource_purify_effect"]
+script = ExtResource("4_effect")
+status_id = &"burning"
+
+[resource]
+script = ExtResource("2_spell")
+id = &"purify"
+spell_name = "Purify"
+description = "Remove Burning from self."
+target_type = 3
+icon = ExtResource("3_icon")
+icon_active = ExtResource("3_icon")
+effects = Array[ExtResource("1_base")]([SubResource("Resource_purify_effect")])

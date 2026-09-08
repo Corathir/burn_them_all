@@ -15,9 +15,11 @@ func populate(new_formation: FormationResource, entries: Array) -> void:
         if child is Enemy:
             child.queue_free()
     for entry in entries:
-        var slot: Enemy = ENEMY_SLOT_SCENE.instantiate()
+        var data: EnemyResource = entry.get("enemy_data")
+        var scene: PackedScene = data.enemy_scene if data and data.enemy_scene else ENEMY_SLOT_SCENE
+        var slot: Enemy = scene.instantiate()
         slot.slot_index = entry.get("slot_index", 0)
-        slot.enemy_data = entry.get("enemy_data")
+        slot.enemy_data = data
         add_child(slot)
     _layout()
 

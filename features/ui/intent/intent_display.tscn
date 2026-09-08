@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://b41gkhtwcgqk2" path="res://features/ui/intent/intent_display.gd" id="1_display"]
 
 [node name="IntentDisplay" type="Control" unique_id=1185085372]
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(96, 56)
 layout_mode = 3
 anchors_preset = 0
 offset_right = 96.0

@@ -10,3 +10,4 @@ class_name EnemyResource
 @export var sprite: Texture2D
 @export var spells: Array[SpellResource] = []
 @export var initial_statuses: Array[PackedScene] = []
+@export var enemy_scene: PackedScene
