@@ -15,6 +15,10 @@ const ATTACK_INTENT_ICON: Texture2D = preload("res://features/ui/intent/attack_i
 
 var next_intent: EnemyIntent
 
+const ALPHA_HIT_THRESHOLD: float = 0.1
+
+var _sprite_image: Image
+
 const JERK_SIDE_OFFSET: float = 24.0
 const JERK_RISE: float = 16.0
 const JERK_DROP: float = 16.0
@@ -161,8 +165,35 @@ func _is_valid_target(spell: SpellResource) -> bool:
 
 func _on_hover_enter() -> void:
     statuses.notify_hover_enter(CombatContext.player, CombatContext.selected_spell)
-    EventBus.enemy_hover_entered.emit(self)
 
 func _on_hover_exit() -> void:
     statuses.notify_hover_exit()
-    EventBus.enemy_hover_exited.emit(self)
+
+## Used by the cursor overlay to test hover against the sprite's silhouette
+## (alpha channel), not its bounding rect or the wider ClickArea (which is
+## deliberately larger to stay clear of StatusContainer).
+func is_point_over_sprite(global_point: Vector2) -> bool:
+    var rect: Rect2 = sprite.get_global_rect()
+    if not rect.has_point(global_point):
+        return false
+    var image: Image = _get_sprite_image()
+    if image == null:
+        return true
+
+    # sprite uses STRETCH_KEEP_ASPECT_CENTERED: map the point back into
+    # texture space, accounting for the centered letterbox padding.
+    var tex_size: Vector2 = image.get_size()
+    var scale: float = min(rect.size.x / tex_size.x, rect.size.y / tex_size.y)
+    var displayed_size: Vector2 = tex_size * scale
+    var offset: Vector2 = rect.position + (rect.size - displayed_size) / 2.0
+    var local: Vector2 = (global_point - offset) / scale
+    if local.x < 0.0 or local.y < 0.0 or local.x >= tex_size.x or local.y >= tex_size.y:
+        return false
+    return image.get_pixel(int(local.x), int(local.y)).a > ALPHA_HIT_THRESHOLD
+
+func _get_sprite_image() -> Image:
+    if _sprite_image == null and sprite.texture != null:
+        _sprite_image = sprite.texture.get_image()
+        if _sprite_image and _sprite_image.is_compressed():
+            _sprite_image.decompress()
+    return _sprite_image

@@ -20,9 +20,6 @@ signal status_stacks_changed(carrier: Node, status: Node, delta: int)
 signal turn_started(actor)
 signal turn_ended_by(actor)
 
-signal enemy_hover_entered(enemy)
-signal enemy_hover_exited(enemy)
-
 signal spells_loaded(spells: Array[SpellResource])
 signal spellbook_changed(owner: Node, spells: Array[SpellResource])
 

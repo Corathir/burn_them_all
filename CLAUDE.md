@@ -223,7 +223,6 @@ Most-used:
 | `accessory_slot_equipped/unequipped` | `slot_index[, accessory]`       | Inventory                          |
 | `log_entry`                     | `String`                             | anywhere → CombatLog               |
 | `spell_selected`                | `SpellResource`                      | CombatManager → Cursor             |
-| `enemy_hover_entered/exited`    | `Enemy`                              | Enemy.ClickArea → Cursor           |
 
 Reserved/legacy (declared but unused): `player_status_changed`, `spells_loaded`, `state_changed`, `combat_finished`.
 
